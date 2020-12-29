@@ -1,1 +1,5 @@
-# TensorflowSER
+venv
+.idea
+
+**/*.ipynb*
+**/__pycache__
