@@ -19,17 +19,6 @@ class SignalCropping(naa.CropAug):
             duration=None)
 
 
-class SignalLoudness(naa.LoudnessAug):
-    def __init__(self,
-                 zone=(0.2, 0.8),
-                 coverage=1.,
-                 factor=(0.5, 2)):
-        super().__init__(
-            zone=zone,
-            coverage=coverage,
-            factor=factor)
-
-
 class SignalMask(naa.MaskAug):
     def __init__(self,
                  zone=(0.2, 0.8),

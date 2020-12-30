@@ -11,7 +11,7 @@ from nlpaug.augmenter.spectrogram import SpectrogramAugmenter
 # --------------------- FREQ MASKING
 
 class FreqMaskingModel(Spectrogram):
-    def __init__(self, mask_factor: int = 27):
+    def __init__(self, mask_factor: float = 27.):
         super().__init__()
         self.mask_factor = mask_factor
 
@@ -22,7 +22,7 @@ class FreqMaskingModel(Spectrogram):
 
 class FreqMaskingAugmenter(SpectrogramAugmenter):
     def __init__(self,
-                 mask_factor: float = 27,
+                 mask_factor: float = 27.,
                  name: str = "FreqMaskingAugmenter",
                  verbose=0):
         super().__init__(

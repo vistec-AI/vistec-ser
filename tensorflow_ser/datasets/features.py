@@ -3,9 +3,16 @@ from typing import *
 import tensorflow as tf
 
 
-def load_waveform(audio_path: str, sample_rate: int = 16000, bit_depth: int = 16, dither: float = 1.) -> tf.Tensor:
-    audio_binary = tf.io.read_file(audio_path)
+def load_waveform(audio: str, sample_rate: int = 16000, bit_depth: int = 16, dither: float = 1.) -> tf.Tensor:
+    if isinstance(audio, str):
+        audio_binary = tf.io.read_file(audio)
+    elif isinstance(audio, bytes):
+        audio_binary = audio
+    else:
+        raise TypeError(f"Type unavailable for `audio`, expected either `str` or `byte` but got {type(audio)}")
     waveform, sr = tf.audio.decode_wav(audio_binary)
+    if sr != sample_rate:
+        raise ValueError(f"Expected sampling rate of {sample_rate} but got {sr}")
     waveform = tf.squeeze(waveform, axis=-1)
     return waveform + tf.random.normal(tf.shape(waveform), stddev=(dither / 2 ** bit_depth))
 
@@ -24,6 +31,13 @@ def normalize_feature(feature: tf.Tensor, scaled: bool = False, epsilon: float =
     return normalized
 
 
+def dbscale(spectrogram: tf.Tensor, top_db: int = 80):
+    power = tf.math.square(spectrogram)
+    log_spec = 10.0 * (tf.math.log(power) / tf.math.log(10.0))
+    log_spec = tf.math.maximum(log_spec, tf.math.reduce_max(log_spec) - top_db)
+    return log_spec
+
+
 class FeatureLoader:
     def __init__(self, config: Dict[str, object]):
         self.sample_rate = config.get('sample_rate', 16000)
@@ -37,7 +51,7 @@ class FeatureLoader:
         self.scale_normalize = config.get('scale_normalize', True)
 
     @property
-    def shape(self) -> List[int]:
+    def shape(self) -> List[Any]:
         if self.feature_type == 'fbank':
             return [None, self.num_mel_bins]
         else:
@@ -54,17 +68,11 @@ class FeatureLoader:
                 )
             )
 
-    def dbscale(self, spectrogram: tf.Tensor, top_db: int=80):
-        power = tf.math.square(spectrogram)
-        log_spec = 10.0 * (tf.math.log(power) / tf.math.log(10.0))
-        log_spec = tf.math.maximum(log_spec, tf.math.reduce_max(log_spec) - top_db)
-        return log_spec
-
-    def make_spectrogram(self, waveform: tf.Tensor, epsilon: float = 1e-8) -> tf.Tensor:
+    def make_spectrogram(self, waveform: tf.Tensor) -> tf.Tensor:
         spectrogram = self.stft(waveform)
-        return self.dbscale(spectrogram)
+        return dbscale(spectrogram)
 
-    def make_fbank(self, waveform: tf.Tensor, fmin: float=0., fmax: float = 8000., epsilon: float = 1e-8) -> tf.Tensor:
+    def make_fbank(self, waveform: tf.Tensor, fmin: float = 0., fmax: float = 8000.) -> tf.Tensor:
         spectrogram = self.stft(waveform)
         mel_fbank = tf.signal.linear_to_mel_weight_matrix(
             num_mel_bins=self.num_mel_bins,
@@ -73,7 +81,7 @@ class FeatureLoader:
             lower_edge_hertz=fmin, upper_edge_hertz=fmax
         )
         fbank = tf.tensordot(spectrogram, mel_fbank, 1)
-        return self.dbscale(fbank)
+        return dbscale(fbank)
 
     def make_mfcc(self, waveform: tf.Tensor) -> tf.Tensor:
         log_mel_spectrogram = self.make_fbank(waveform)
@@ -89,6 +97,7 @@ class FeatureLoader:
         elif self.feature_type == "mfcc":
             features = self.make_mfcc(waveform)
         else:
-            raise KeyError("Unsupported feature type `{}`. Only `spectrogram`, `fbank`, and `mfcc` available.".format(self.feature_type))
+            raise KeyError(f"Unsupported feature type `{self.feature_type}`. Only `spectrogram`, `fbank`, and `mfcc` "
+                           f"available.")
 
         return normalize_feature(features, scaled=self.scale_normalize)
