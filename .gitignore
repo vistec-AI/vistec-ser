@@ -3,3 +3,4 @@ venv
 
 **/*.ipynb*
 **/__pycache__
+**/*.csv
