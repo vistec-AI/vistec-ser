@@ -9,6 +9,8 @@ from augmentations.augmentation import Augmentation
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 TFRECORD_SHARDS = 16
+EMO2IDX = {'neutral': 0, 'anger': 1, 'happiness': 2, 'sadness': 3, 'frustration': 4}
+IDX2EMO = {v : k for k, v in EMO2IDX.items()}
 
 
 class DataLoader:
@@ -54,14 +56,14 @@ class DataLoader:
             features = self.augmentations.feat_augment.augment(features)
             features = tf.convert_to_tensor(features)
 
-            return features, emotion
+            return features, EMO2IDX[emotion.decode()]
 
     @tf.function
     def parse(self, data):
         return tf.numpy_function(
             self.preprocess,
             inp=[data[0], data[1]],
-            Tout=[tf.float32, tf.string]
+            Tout=[tf.float32, tf.int64]
         )
 
     def process_dataset(self, dataset: tf.data.Dataset, batch_size: int) -> tf.data.Dataset:
