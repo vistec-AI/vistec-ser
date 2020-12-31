@@ -21,8 +21,8 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 3 - Alpha',  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
         'Intended Audience :: Developers',
-        'Topic :: Speech Emotion Recognition :: Deep Learning :: Speech Processing',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
+        'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3.8',
     ],
     python_requires='>=3.8'

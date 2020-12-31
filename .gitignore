@@ -1,6 +1,9 @@
 venv
 .idea
 
+*.egg-info
+dist
+
 **/*.ipynb*
 **/__pycache__
 **/*.csv
