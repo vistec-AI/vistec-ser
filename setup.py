@@ -8,14 +8,14 @@ requirements = [
 ]
 
 setuptools.setup(
-    name="VistecSER",
+    name="vistec-ser",
     version="0.1a",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
     description="Speech Emotion Recognition models and training using Tensorflow 2.x",
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/tann9949/VistecSER',
+    url='https://github.com/tann9949/vistec-ser',
     packages=setuptools.find_packages(include=['vistec_ser*']),
     install_requires=requirements,
     classifiers=[

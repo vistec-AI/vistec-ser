@@ -7,13 +7,13 @@ Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 ## Installation
 ### From Pypi
 ```shell
-pip install VistecSER
+pip install vistec-ser
 ```
 
 ### From source
 ```shell
-git clone https://github.com/tann9949/VistecSER.git
-cd VistecSER
+git clone https://github.com/tann9949/vistec-ser.git
+cd vistec-ser
 python setup.py install
 ```
 
