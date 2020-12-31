@@ -18,5 +18,12 @@ setuptools.setup(
     url='https://github.com/tann9949/VistecSER',
     packages=setuptools.find_packages(include=['vistec_ser*']),
     install_requires=requirements,
+    classifiers=[
+        'Development Status :: 3 - Alpha',  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
+        'Intended Audience :: Developers',
+        'Topic :: Speech Emotion Recognition :: Deep Learning :: Speech Processing',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.8',
+    ],
     python_requires='>=3.8'
 )
