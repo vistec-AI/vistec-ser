@@ -1,7 +1,31 @@
 # Vistec-AIS Speech Emotion Recognition
-![LICENSE](https://github.com/tann9949/VistecSER/blob/master/LICENSE)
+![python-badge](https://img.shields.io/badge/python-%3E%3D3.6-blue?logo=python)
+![tensorflow-badge](https://img.shields.io/badge/tensorflow-%3E%3D2.4.0-orange?logo=tensorflow)
+
 Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 
+## Installation
+### From Pypi
+```shell
+pip install VistecSER
+```
+
+### From source
+```shell
+git clone https://github.com/tann9949/VistecSER.git
+cd VistecSER
+python setup.py install
+```
+
+## Usage
+### Inferencing using pretrained weight
+*TODO*
+
+### Train with Your Own Data
+*TODO*
+
+## Model Description
+*TODO*
 
 ## Reference
 This repository was structured based on [TensorflowASR](https://github.com/TensorSpeech/TensorFlowASR) repository by
