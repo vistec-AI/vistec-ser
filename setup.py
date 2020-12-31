@@ -18,8 +18,5 @@ setuptools.setup(
     url='https://github.com/tann9949/VistecSER',
     packages=setuptools.find_packages(include=['vistec_ser*']),
     install_requires=requirements,
-    classifiers=[
-
-    ],
     python_requires='>=3.8'
 )
