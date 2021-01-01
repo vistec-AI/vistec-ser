@@ -1,4 +1,4 @@
-from typing import *
+from typing import List, Any, Union, Tuple
 import multiprocessing as mp
 
 from glob import glob
@@ -65,7 +65,7 @@ class DataLoader:
             np.random.shuffle(lines)
         return lines
 
-    def get_dataset(self, batch_size) -> tf.data.Dataset:
+    def get_dataset(self, batch_size) -> Union[tf.data.Dataset, None]:
         data = self.read_csv()
         if len(data) == 0:
             return None

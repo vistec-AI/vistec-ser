@@ -1,7 +1,8 @@
-from typing import *
+from typing import Tuple
 
 import tensorflow as tf
-from tensorflow.keras.layers import *
+from tensorflow.keras.layers import Conv1D, MaxPool1D, Conv2D, MaxPool2D, BatchNormalization, LayerNormalization, Layer
+
 
 class CNN2DBlock(Layer):
     def __init__(self,

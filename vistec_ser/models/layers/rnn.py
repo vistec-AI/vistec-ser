@@ -1,6 +1,6 @@
 from typing import *
 
-from tensorflow.keras.layers import *
+from tensorflow.keras.layers import Bidirectional, LSTM, GRU, SimpleRNN, TimeDistributed, Dense, Layer
 import tensorflow as tf
 
 
@@ -19,7 +19,7 @@ class BiPyramidRNN(Layer):
         else:
             raise NameError('Unrecognized rnn_type: {}'.format(rnn_type))
 
-    def call(self, x):
+    def call(self, x, **kwargs):
         i = 0
         for rnn in self.rnn_stack:
             if i == 0:
@@ -55,7 +55,7 @@ class AttentiveRNN(Layer):
 
         self.f_attn = TimeDistributed(Dense(1, activation='tanh'))
 
-    def call(self, x, training=False, return_attn=True):
+    def call(self, x, training=False, return_attn=True, **kwargs):
         for rnn in self.RNNs:
             x = rnn(x)
 

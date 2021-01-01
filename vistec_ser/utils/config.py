@@ -1,5 +1,5 @@
 import re
-from typing import *
+from typing import Dict
 
 import yaml
 
