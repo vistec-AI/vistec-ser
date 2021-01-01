@@ -1,13 +1,11 @@
 from vistec_ser.datasets import DataLoader, FeatureLoader
 from vistec_ser.utils.config import Config
-import sys
-import os
 
 CONFIG_PATH = 'config.yml'
+CSV_PATH = 'samples/lables.csv'
 
 
-def main(args):
-    csv_path = args[1]
+def main():
     config = Config(path=CONFIG_PATH)
     feature_loader = FeatureLoader(config=config.feature_config)
     data_loader = DataLoader(feature_loader=feature_loader, csv_paths=csv_path, augmentations=config.augmentations)
@@ -17,4 +15,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
