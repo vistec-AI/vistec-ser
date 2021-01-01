@@ -7,6 +7,7 @@ requirements = [
     "nlpaug>=1.1.1",
     "numpy>=1.19.2,<1.20.0",
     "soundfile>=0.10.3",
+    "PyYAML>=5.3.1",
 ]
 
 setuptools.setup(
