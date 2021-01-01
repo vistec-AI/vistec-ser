@@ -1,7 +1,8 @@
 from tensorflow.keras import Model
+import tensorflow as tf
 
-from models.layers.cnn_blocks import *
-from models.layers.rnn import *
+from .layers.cnn_blocks import *
+from .layers.rnn import *
 
 
 def get_cnn(filters: int, kernel_size: int, stride: int = 1, activation: str = 'relu'):
@@ -111,3 +112,19 @@ class CNN1DLSTM(Model):
             x = tf.nn.dropout(x, rate=self.dropout)
         x = self.logits(x)
         return tf.nn.softmax(x, axis=-1)
+
+
+class TestModel(Model):
+
+    def __init__(self, n_classes: int = 4, **kwargs):
+        super().__init__(**kwargs)
+        self.logits = Dense(n_classes)
+
+    def call(self, x, **kwargs):
+        x = tf.reduce_mean(x, axis=1)
+        x = self.logits(x)
+        x = tf.nn.softmax(x, axis=-1)
+        return x
+
+    def get_config(self):
+        super().get_config()
