@@ -15,6 +15,7 @@ jobs:
         python-version: '3.8.x'
     - name: Install dependencies
       run: |
+        sudo apt-get install libsndfile1
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
     - name: Install package
