@@ -44,5 +44,4 @@ jobs:
           python setup.py install
       - name: Run tests/test_dataloader.py
         run: |
-          ls tests
           python tests/test_dataloader.py $PWD/tests/config.yml $PWD/tests/samples/labels.csv
