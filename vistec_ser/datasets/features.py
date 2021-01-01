@@ -1,4 +1,4 @@
-from typing import *
+from typing import List, Dict, Any
 
 import tensorflow as tf
 
