@@ -111,3 +111,19 @@ class CNN1DLSTM(Model):
             x = tf.nn.dropout(x, rate=self.dropout)
         x = self.logits(x)
         return tf.nn.softmax(x, axis=-1)
+
+
+class TestModel(Model):
+
+    def __init__(self, n_classes: int = 4, **kwargs):
+        super().__init__(**kwargs)
+        self.logits = Dense(n_classes)
+
+    def call(self, x, **kwargs):
+        x = tf.reduce_mean(x, axis=1)
+        x = self.logits(x)
+        x = tf.nn.softmax(x, axis=-1)
+        return x
+
+    def get_config(self):
+        super().get_config()
