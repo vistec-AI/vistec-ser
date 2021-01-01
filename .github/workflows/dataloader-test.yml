@@ -3,7 +3,7 @@ name: Extracting Features
 on: push
 
 jobs:
-  deploy:
+  linux_job:
 
     runs-on: ubuntu-latest
 
@@ -23,4 +23,25 @@ jobs:
         python setup.py install
     - name: Run tests/test_dataloader.py
       run: |
-        python tests/test_dataloader.py
+        python tests/test_dataloader.py tests/config.yml tests/samples/labels.csv
+
+  macos_job:
+
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Install package
+        run: |
+          python setup.py install
+      - name: Run tests/test_dataloader.py
+        run: |
+          python tests/test_dataloader.py tests/config.yml tests/samples/labels.csv
