@@ -1,4 +1,4 @@
-from typing import *
+from typing import List
 
 from tensorflow.keras.layers import Bidirectional, LSTM, GRU, SimpleRNN, TimeDistributed, Dense, Layer
 import tensorflow as tf
