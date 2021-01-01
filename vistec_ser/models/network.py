@@ -1,8 +1,7 @@
 from tensorflow.keras import Model
 import tensorflow as tf
 
-from .layers.cnn_blocks import *
-from .layers.rnn import *
+from .layers.cnn_blocks import CNN1DBlock
 
 
 def get_cnn(filters: int, kernel_size: int, stride: int = 1, activation: str = 'relu'):
