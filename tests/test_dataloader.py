@@ -1,8 +1,12 @@
 from vistec_ser.datasets import DataLoader, FeatureLoader
 from vistec_ser.utils.config import Config
+import vistec_ser
 
-CONFIG_PATH = 'config.yml'
-CSV_PATH = 'samples/lables.csv'
+import os
+
+TEST_ROOT = os.path.dirname(vistec_ser.__file__)
+CONFIG_PATH = os.path.join(TEST_ROOT, '../tests/config.yml')
+CSV_PATH = os.path.join(TEST_ROOT, '../samples/lables.csv')
 
 
 def main():
