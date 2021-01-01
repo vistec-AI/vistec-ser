@@ -4,6 +4,7 @@
 ![license](	https://img.shields.io/github/license/tann9949/vistec-ser)
 
 ![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
+![Extracting Features](https://github.com/tann9949/vistec-ser/workflows/Extracting%20Features/badge.svg)
 
 Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 
