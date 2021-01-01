@@ -1,4 +1,7 @@
+from typing import List
+
 from tensorflow.keras import Model
+from tensorflow.keras.layers import Conv1D, BatchNormalization, LSTM, Bidirectional, Dense, Masking
 import tensorflow as tf
 
 from .layers.cnn_blocks import CNN1DBlock
