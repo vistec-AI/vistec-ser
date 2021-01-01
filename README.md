@@ -73,7 +73,9 @@ This repository was structured based on [TensorflowASR](https://github.com/Tenso
 Huy Le Nguyen ([@usimarit](https://github.com/usimarit)). Please check it out!
 
 
-## Author
+## Author & Sponsor
+[![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
+
 Chompakorn Chaksangchaichot
 
 Email: [chompakornc_pro@vistec.ac.th](chompakornc_pro@vistec.ac.th)
