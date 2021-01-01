@@ -1,4 +1,5 @@
 from tensorflow.keras import Model
+import tensorflow as tf
 
 from models.layers.cnn_blocks import *
 from models.layers.rnn import *
