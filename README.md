@@ -6,6 +6,9 @@
 ![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
 ![Training](https://github.com/tann9949/vistec-ser/workflows/Training/badge.svg)
 
+![Code Grade](https://www.code-inspector.com/project/17426/status/svg)
+![Code Quality Score](https://www.code-inspector.com/project/17426/score/svg)
+
 Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 
 ## Installation
