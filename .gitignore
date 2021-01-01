@@ -1,9 +1,10 @@
 venv
 .idea
+**/.DS_Store
 
 *.egg-info
 dist
+build
 
 **/*.ipynb*
 **/__pycache__
-**/*.csv

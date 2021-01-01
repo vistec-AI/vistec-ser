@@ -54,18 +54,18 @@ class DataLoader:
         self.feature_loader = feature_loader
         self.augmentations = augmentations
 
-    def read_csv(self):
+    def read_csv(self) -> np.ndarray:
         lines = list()
         for csv in self.csv_paths:
             print(f"Reading {csv}...")
             with tf.io.gfile.GFile(csv, 'r') as f:
-                lines = f.read().splitlines()[1:]  # skip header
+                lines += f.read().splitlines()[1:]  # skip header
         lines = np.array([line.split(',') for line in lines])  # line i: audio_path, emotion
         if self.shuffle:
             np.random.shuffle(lines)
         return lines
 
-    def get_dataset(self, batch_size):
+    def get_dataset(self, batch_size) -> tf.data.Dataset:
         data = self.read_csv()
         if len(data) == 0:
             return None

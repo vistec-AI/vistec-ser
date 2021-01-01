@@ -4,12 +4,7 @@ import tensorflow as tf
 
 
 def load_waveform(audio: str, sample_rate: int = 16000, bit_depth: int = 16, dither: float = 1.) -> tf.Tensor:
-    if isinstance(audio, str):
-        audio_binary = tf.io.read_file(audio)
-    elif isinstance(audio, bytes):
-        audio_binary = audio
-    else:
-        raise TypeError(f"Type unavailable for `audio`, expected either `str` or `byte` but got {type(audio)}")
+    audio_binary = tf.io.read_file(audio)
     waveform, sr = tf.audio.decode_wav(audio_binary)
     if sr != sample_rate:
         raise ValueError(f"Expected sampling rate of {sample_rate} but got {sr}")

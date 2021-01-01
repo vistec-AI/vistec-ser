@@ -3,7 +3,8 @@
 ![tensorflow-badge](https://img.shields.io/badge/tensorflow-%3E%3D2.4.0-orange?logo=tensorflow)
 ![license](	https://img.shields.io/github/license/tann9949/vistec-ser)
 
-![Publish Python distributions to PyPI and TestPyPI](https://github.com/tann9949/vistec-ser/workflows/Publish%20Python%20distributions%20to%20PyPI%20and%20TestPyPI/badge.svg)
+![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
+![Extracting Features](https://github.com/tann9949/vistec-ser/workflows/Extracting%20Features/badge.svg)
 
 Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 
