@@ -5,7 +5,8 @@ requirements = [
     "tensorflow_io>=0.17",
     "librosa>=0.8.0",
     "nlpaug>=1.1.1",
-    "numpy>=1.19.2,<1.20.0"
+    "numpy>=1.19.2,<1.20.0",
+    "soundfile>=0.10.3",
 ]
 
 setuptools.setup(
