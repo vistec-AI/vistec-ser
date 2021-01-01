@@ -23,7 +23,7 @@ jobs:
         python setup.py install
     - name: Run tests/test_dataloader.py
       run: |
-        python tests/test_dataloader.py tests/config.yml tests/samples/labels.csv
+        python tests/test_dataloader.py ../tests/config.yml ../tests/samples/labels.csv
 
   macos_job:
 
@@ -44,4 +44,5 @@ jobs:
           python setup.py install
       - name: Run tests/test_dataloader.py
         run: |
-          python tests/test_dataloader.py tests/config.yml tests/samples/labels.csv
+          ls tests
+          python tests/test_dataloader.py ../tests/config.yml ../tests/samples/labels.csv
