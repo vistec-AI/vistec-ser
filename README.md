@@ -4,7 +4,7 @@
 ![license](	https://img.shields.io/github/license/tann9949/vistec-ser)
 
 ![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
-![Extracting Features](https://github.com/tann9949/vistec-ser/workflows/Extracting%20Features/badge.svg)
+![Training](https://github.com/tann9949/vistec-ser/workflows/Training/badge.svg)
 
 Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
 
@@ -37,7 +37,7 @@ To train with your own data, you need to prepare 2 files:
       
 #### Preparing a model
 Now, prepare your model, you can implement your own model using `tf.keras.Sequential` or using provided model
-in [models.py](vistec_ser/models/models.py).
+in [models.py](vistec_ser/models/network.py).
 
 #### Training
 For training a model, create a `DataLoader` object and use method `.get_dataset` to get `tf.data.Dataset` used 
