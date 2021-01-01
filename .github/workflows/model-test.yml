@@ -1,4 +1,4 @@
-name: Extracting Features
+name: Training
 
 on: push
 
@@ -21,11 +21,11 @@ jobs:
     - name: Install package
       run: |
         python setup.py install
-    - name: Run tests/test_dataloader.py
+    - name: Run tests/test_training.py
       run: |
         echo "$PWD"
         ls $PWD
-        python tests/test_dataloader.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
+        python tests/test_training.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
 
   macos_job:
 
@@ -44,8 +44,8 @@ jobs:
       - name: Install package
         run: |
           python setup.py install
-      - name: Run tests/test_dataloader.py
+      - name: Run tests/test_training.py
         run: |
           echo "$PWD"
           ls $PWD
-          python tests/test_dataloader.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
+          python tests/test_training.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
