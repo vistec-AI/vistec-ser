@@ -29,6 +29,8 @@ python setup.py install
 
 ## Usage
 ### Train with Your Own Data
+[![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wc9CUuGrQHw29o3g9Iy-Wmjksebgtmau?usp=sharing)
+
 #### Preparing Data
 To train with your own data, you need to prepare 2 files:
 1. `config.yml` (see an example in [tests/config.yml](tests/config.yml)) - This file contains a
@@ -36,7 +38,7 @@ To train with your own data, you need to prepare 2 files:
 2. `labels.csv` - This will be a `.csv` file containing 2 columns mapping audio path to its emotion.
     - **Your `.csv` file should contain a header** (as we will skip the first line when reading).
     - **Currently, we only support 5 emotions (`neutral`, `anger`, `happiness`, `sadness`, and `frustration`) if
-    you want to add more, modify `EMO2IDX` variable in [dataloader.py](vistec_ser/datasets/dataloader.py)**
+    you want to add more, modify `EMOTIONS` variable in [dataloader.py](vistec_ser/datasets/dataloader.py)**
       
 #### Preparing a model
 Now, prepare your model, you can implement your own model using `tf.keras.Sequential` or using provided model
@@ -45,28 +47,7 @@ in [models.py](vistec_ser/models/network.py).
 #### Training
 For training a model, create a `DataLoader` object and use method `.get_dataset` to get `tf.data.Dataset` used 
 for training. `DataLoader` will also use `FeatureLoader` which will read `config.yml`. 
-The dataset will automatically pad a batch according to the longest sequence length. 
-
-Here's a code example:
-```python
-from vistec_ser.datasets import DataLoader, FeatureLoader
-from vistec_ser.utils.config import Config
-
-train_csv_path = ...
-val_csv_path = ...
-config_path = ...
-model = ...
-
-config = Config(path=config_path)
-feature_loader = FeatureLoader(config=config.feature_config)
-train_loader = DataLoader(feature_loader=feature_loader, csv_paths=train_csv_path, augmentations=config.augmentations)
-train_dataset = train_loader.get_dataset(batch_size=2)
-val_loader = DataLoader(feature_loader=feature_loader, csv_paths=val_csv_path)
-val_dataset = val_loader.get_dataset(batch_size=2)
-
-model.compile(...)
-model.fit(train_dataset, validation_data=val_dataset, ...)
-```
+The dataset will automatically pad a batch according to the longest sequence length.
 
 ### Inferencing using pretrained weight
 *TODO*

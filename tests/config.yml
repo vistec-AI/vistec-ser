@@ -5,13 +5,14 @@ feature_config:
   num_mel_bins: 40
   feature_type: fbank
   preemphasis: 0.97
-  scale_normalize: False
+  scale_normalize: True
+  max_length: 3000
+  vtlp:
+    min_alpha: 0.9
+    max_alpha: 1.1
+    alpha_step: 0.1
 
 augmentations:
-  wave_augment:
-    vtlp: null
-    shift:
-      duration: 1
   feature_augment:
     freq_masking:
       num_masks: 1
