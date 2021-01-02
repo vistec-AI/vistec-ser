@@ -1,4 +1,4 @@
-from typing import List, Any, Union, Tuple
+from typing import List, Union
 import multiprocessing as mp
 
 from glob import glob
@@ -13,8 +13,7 @@ from ..utils import bytestring_feature, print_one_line
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 TFRECORD_SHARDS = 16
-EMO2IDX = {'neutral': 0, 'anger': 1, 'happiness': 2, 'sadness': 3, 'frustration': 4}
-IDX2EMO = {v: k for k, v in EMO2IDX.items()}
+EMOTIONS = ['neutral', 'anger', 'sadness', 'happiness']
 
 
 def to_tfrecord(path: bytes, audio: bytes, emotion: int) -> tf.train.Example:
@@ -53,6 +52,7 @@ class DataLoader:
         self.shuffle = shuffle
         self.feature_loader = feature_loader
         self.augmentations = augmentations
+        self.steps_per_epoch = None
 
     def read_csv(self) -> np.ndarray:
         lines = list()
@@ -72,17 +72,19 @@ class DataLoader:
         dataset = tf.data.Dataset.from_tensor_slices(data)
         return self.process_dataset(dataset, batch_size=batch_size)
 
-    def preprocess(self, audio_path, emotion) -> Tuple[Any, int]:
+    @tf.function
+    def preprocess(self, data):
+        audio_path = data[0]
+        emotion = data[1]
         with tf.device('/CPU:0'):
             waveform = load_waveform(audio_path)
 
             # apply augmentation and feature extraction
-            waveform = self.augmentations.wave_augment.augment(waveform.numpy())
             features = self.feature_loader.extract(waveform)
             features = self.augmentations.feat_augment.augment(features)
-            features = tf.convert_to_tensor(features)
 
-            return features, EMO2IDX[emotion.decode()]
+            label = tf.argmax(tf.stack([tf.equal(emotion, e) for e in EMOTIONS], axis=-1))
+            return features, label
 
     @tf.function
     def parse(self, data):
@@ -95,7 +97,7 @@ class DataLoader:
     def process_dataset(self,
                         dataset: Union[tf.data.Dataset, tf.data.TFRecordDataset],
                         batch_size: int) -> tf.data.Dataset:
-        dataset = dataset.map(self.parse, num_parallel_calls=AUTOTUNE)
+        dataset = dataset.map(self.preprocess, num_parallel_calls=AUTOTUNE)
 
         if self.shuffle:
             dataset = dataset.shuffle(TFRECORD_SHARDS, reshuffle_each_iteration=True)
@@ -107,11 +109,12 @@ class DataLoader:
                 tf.TensorShape([])
             ),
             padding_values=(0., None),
-            drop_remainder=True
+            drop_remainder=False
         )
 
         dataset = dataset.prefetch(AUTOTUNE)
-        return dataset
+        self.steps_per_epoch = len(dataset)
+        return dataset.repeat(None)
 
 
 class TFRecordDataset(DataLoader):
