@@ -3,8 +3,6 @@ from typing import Dict
 
 import yaml
 
-from vistec_ser.augmentations import Augmentation
-
 
 def load_yaml(path: str) -> Dict[str, object]:
     # Fix yaml numbers https://stackoverflow.com/a/30462009/11037553
@@ -37,5 +35,4 @@ class FeatureConfig:
 class Config:
     def __init__(self, path: str):
         config = load_yaml(path)
-        self.augmentations = Augmentation(config=config.get('augmentations', {}))
         self.feature_config = config.get('feature_config', {})

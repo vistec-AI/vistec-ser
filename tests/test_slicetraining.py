@@ -1,14 +1,13 @@
-from vistec_ser.datasets import DataLoader, FeatureLoader
+from vistec_ser.datasets import DataLoader, FeatureLoader, SliceDataLoader
 from vistec_ser.utils.config import Config
 from vistec_ser.models import TestModel
 import sys
 import os
 
 
-def test_dataloader(feature_loader: FeatureLoader, batch_size: int, csv_path: str):
-    train_loader = DataLoader(feature_loader=feature_loader, csv_paths=csv_path)
-    train_dataset = train_loader.get_dataset(batch_size=batch_size)
-    steps_per_epoch = train_loader.steps_per_epoch
+def test_slicedataloader(feature_loader: FeatureLoader, batch_size: int, csv_path: str):
+    train_loader = SliceDataLoader(feature_loader=feature_loader, csv_paths=csv_path)
+    X_train, y_train = train_loader.get_dataset()
 
     val_loader = DataLoader(feature_loader=feature_loader, csv_paths=csv_path)
     val_dataset = val_loader.get_dataset(batch_size=batch_size)
@@ -17,9 +16,10 @@ def test_dataloader(feature_loader: FeatureLoader, batch_size: int, csv_path: st
     model = TestModel()
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics='accuracy')
     model.fit(
-        train_dataset,
+        X_train,
+        y_train,
+        batch_size=batch_size,
         validation_data=val_dataset,
-        steps_per_epoch=steps_per_epoch,
         validation_steps=validation_steps,
         epochs=1
     )
@@ -34,7 +34,7 @@ def main(argv):
 
     config = Config(path=config_path)
     feature_loader = FeatureLoader(config=config.feature_config)
-    test_dataloader(feature_loader=feature_loader, batch_size=batch_size, csv_path=csv_path)
+    test_slicedataloader(feature_loader=feature_loader, batch_size=batch_size, csv_path=csv_path)
 
 
 if __name__ == '__main__':

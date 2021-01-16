@@ -23,9 +23,10 @@ jobs:
         python setup.py install
     - name: Run tests/test_training.py
       run: |
-        echo "$PWD"
-        ls $PWD
         python tests/test_training.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
+    - name: Run tests/test_slicetraining.py
+      run: |
+        python tests/test_slicetraining.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
 
   macos_job:
 
@@ -46,6 +47,7 @@ jobs:
           python setup.py install
       - name: Run tests/test_training.py
         run: |
-          echo "$PWD"
-          ls $PWD
           python tests/test_training.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
+      - name: Run tests/test_slicetraining.py
+        run: |
+          python tests/test_slicetraining.py "$PWD/tests/config.yml" "$PWD/tests/samples/labels.csv"
