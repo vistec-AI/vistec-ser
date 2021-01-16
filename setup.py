@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=requirements,
     classifiers=[
         # "2 - Pre-Alpha", "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
-        'Development Status :: 3 - Alpha'
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Topic :: Software Development :: Libraries :: Python Modules',
