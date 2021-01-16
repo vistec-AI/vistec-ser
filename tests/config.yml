@@ -11,12 +11,3 @@ feature_config:
     min_alpha: 0.9
     max_alpha: 1.1
     alpha_step: 0.1
-
-augmentations:
-  feature_augment:
-    freq_masking:
-      num_masks: 1
-      mask_factor: 10
-    time_masking:
-      num_masks: 2
-      mask_factor: 30
