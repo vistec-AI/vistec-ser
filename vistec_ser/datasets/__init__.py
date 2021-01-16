@@ -1,2 +1,3 @@
 from .dataloader import DataLoader
-from .features import FeatureLoader
+from .slice_dataloader import SliceDataLoader
+from .features.featureloader import FeatureLoader
