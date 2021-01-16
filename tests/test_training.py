@@ -14,7 +14,7 @@ def main(argv):
 
     config = Config(path=config_path)
     feature_loader = FeatureLoader(config=config.feature_config)
-    train_loader = DataLoader(feature_loader=feature_loader, csv_paths=csv_path,augmentations=config.augmentations)
+    train_loader = DataLoader(feature_loader=feature_loader, csv_paths=csv_path)
     train_dataset = train_loader.get_dataset(batch_size=batch_size)
     steps_per_epoch = train_loader.steps_per_epoch
 
