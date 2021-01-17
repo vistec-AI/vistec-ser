@@ -1,6 +1,32 @@
 import tensorflow as tf
 
 
+class WeightedAccuracy(tf.keras.metrics.Metric):
+    def __init__(self, name='weighted_accuracy', **kwargs):
+        super().__init__(name, **kwargs)
+        self.weighted_accuracy = self.add_weight(name='wa', initializer='zeros')
+
+    def update_state(self, y_true, y_pred, *args, **kwargs):
+        wa = weighted_accuracy(y_true, y_pred)
+        self.weighted_accuracy.assign_add(wa)
+
+    def result(self):
+        return self.weighted_accuracy
+
+
+class UnweightedAccuracy(tf.keras.metrics.Metric):
+    def __init__(self, name='unweighted_accuracy', **kwargs):
+        super().__init__(name, **kwargs)
+        self.unweighted_accuracy = self.add_weight(name='wa', initializer='zeros')
+
+    def update_state(self, y_true, y_pred, sample_weight=None, *args, **kwargs):
+        ua = weighted_accuracy(y_true, y_pred)
+        self.unweighted_accuracy.assign_add(ua)
+
+    def result(self):
+        return self.unweighted_accuracy
+
+
 def weighted_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
     y_true = tf.cast(y_true, tf.int64)
     y_pred = tf.cast(y_pred, tf.int64)

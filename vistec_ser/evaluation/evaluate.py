@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Tuple
 
 import tensorflow as tf
 
@@ -7,11 +7,11 @@ from ..datasets.features.preprocessing import chop_feature
 from ..models.base_model import BaseModel
 
 
-def evaluate_model(
+def evaluate_slice_model(
         model: BaseModel,
         X_test: Union[List[tf.Tensor], tf.Tensor],
         y_test: tf.Tensor,
-        mode: str = 'chunk', **kwargs) -> tf.Tensor:
+        mode: str = 'chunk', **kwargs) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
     n_samples = tf.shape(X_test)[0]
     y_pred = tf.TensorArray(tf.int64, size=0, dynamic_size=True)
     for i in tf.range(n_samples):
