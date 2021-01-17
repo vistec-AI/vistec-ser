@@ -1,43 +1,37 @@
+from typing import Union, List
+
 import tensorflow as tf
 
-
-def weighted_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
-    n_samples = tf.shape(y_true)[0]
-    n_correct = tf.reduce_sum(tf.cast(tf.equal(y_true, y_pred), tf.int64))
-    return n_correct / n_samples
+from .metrics import weighted_accuracy, unweighted_accuracy, compute_confusion_matrix
+from ..datasets.features.preprocessing import chop_feature
+from ..models.base_model import BaseModel
 
 
-def unweighted_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor, return_average: bool = True) -> tf.Tensor:
-    emotions, _ = tf.unique(y_true)
-    n_emotions = tf.cast(tf.shape(emotions)[0], tf.float32)
-    classes_acc = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
-    for i in tf.range(tf.shape(emotions)[0]):
-        emo = emotions[i]
-        emo_idx = get_emotion_indices(y_true, emo)
-        emo_pred = tf.gather(y_pred, emo_idx)
-        n_correct = tf.reduce_sum(tf.cast(tf.equal(emo_pred, emo), tf.int32))
-        n_samples = tf.shape(emo_idx)[0]
-        class_accuracy = tf.cast(n_correct / n_samples, tf.float32)
-        classes_acc = classes_acc.write(classes_acc.size(), class_accuracy)
-    if return_average:
-        return tf.reduce_sum(classes_acc.stack()) / n_emotions
-    return classes_acc.stack()
+def evaluate_model(
+        model: BaseModel,
+        X_test: Union[List[tf.Tensor], tf.Tensor],
+        y_test: tf.Tensor,
+        mode: str = 'chunk', **kwargs) -> tf.Tensor:
+    n_samples = tf.shape(X_test)[0]
+    y_pred = tf.TensorArray(tf.int64, size=0, dynamic_size=True)
+    for i in tf.range(n_samples):
+        x_test = X_test[i]
+        if mode == "chunk":
+            y_pred = y_pred.write(y_pred.size(), evaluate_chunk(model, x_test), **kwargs)
+        else:
+            y_pred = y_pred.write(y_pred.size(), evaluate_full(model, x_test))
+    y_pred = y_pred.stack()
+    wa = weighted_accuracy(y_test, y_pred)
+    ua = unweighted_accuracy(y_test, y_pred)
+    cm = compute_confusion_matrix(y_test, y_pred)
+    return wa, ua, cm
 
 
-def get_emotion_indices(y: tf.Tensor, emotion_index: int) -> tf.Tensor:
-    return tf.reshape(tf.where(tf.equal(y, emotion_index)), (-1,))
+def evaluate_chunk(model: BaseModel, x_test: tf.Tensor, n_frames: int = 300) -> tf.Tensor:
+    chunk_test = chop_feature(x_test, n_frames=n_frames)
+    y_pred = tf.argmax(tf.reduce_mean(model(chunk_test, training=False), axis=0), axis=-1)
+    return y_pred
 
 
-def compute_confusion_matrix(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
-    return tf.math.confusion_matrix(y_true, y_pred)
-
-
-def normalize_confusion_matrix(confusion_matrix: tf.Tensor, axis: int = 1) -> tf.Tensor:
-    if axis == 0:
-        return confusion_matrix / tf.reduce_sum(confusion_matrix, axis=0)
-    elif axis == 1:
-        cm_transpose = tf.transpose(confusion_matrix, (), (1, 0))
-        norm_cm_transpose = cm_transpose / tf.reduce_sum(cm_transpose, axis=1)
-        return tf.transpose(norm_cm_transpose, (1, 0))
-    else:
-        raise ValueError("Invalid `axis` argument. Only 0 or 1 available")
+def evaluate_full(model: BaseModel, x_test: tf.Tensor) -> tf.Tensor:
+    return tf.argmax(model(tf.expand_dims(x_test, 0), training=False))
