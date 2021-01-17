@@ -1,4 +1,5 @@
 from vistec_ser.datasets import DataLoader, FeatureLoader, SliceDataLoader
+from vistec_ser.evaluation.metrics import WeightedAccuracy, UnweightedAccuracy
 from vistec_ser.utils.config import Config
 from vistec_ser.models import TestModel
 import sys
@@ -16,7 +17,7 @@ def test_slicedataloader(config: Config, batch_size: int, csv_path: str):
     validation_steps = val_loader.steps_per_epoch
 
     model = TestModel(config.model_config)
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics='accuracy')
+    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=[WeightedAccuracy(), UnweightedAccuracy()])
     model.fit(
         X_train,
         y_train,
