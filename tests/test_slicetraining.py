@@ -5,7 +5,9 @@ import sys
 import os
 
 
-def test_slicedataloader(feature_loader: FeatureLoader, batch_size: int, csv_path: str):
+def test_slicedataloader(config: Config, batch_size: int, csv_path: str):
+    feature_loader = FeatureLoader(config=config.feature_config)
+
     train_loader = SliceDataLoader(feature_loader=feature_loader, csv_paths=csv_path)
     X_train, y_train = train_loader.get_dataset()
 
@@ -13,7 +15,7 @@ def test_slicedataloader(feature_loader: FeatureLoader, batch_size: int, csv_pat
     val_dataset = val_loader.get_dataset(batch_size=batch_size)
     validation_steps = val_loader.steps_per_epoch
 
-    model = TestModel()
+    model = TestModel(config.model_config)
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics='accuracy')
     model.fit(
         X_train,
@@ -31,10 +33,9 @@ def main(argv):
     assert os.path.exists(csv_path), f"CSV path `{csv_path}` does not exists."
 
     batch_size = 2
-
     config = Config(path=config_path)
-    feature_loader = FeatureLoader(config=config.feature_config)
-    test_slicedataloader(feature_loader=feature_loader, batch_size=batch_size, csv_path=csv_path)
+
+    test_slicedataloader(config=config, batch_size=batch_size, csv_path=csv_path)
 
 
 if __name__ == '__main__':

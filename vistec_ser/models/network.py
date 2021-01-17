@@ -1,9 +1,9 @@
-from typing import List
+from typing import Dict, Any
 
-from tensorflow.keras import Model
 from tensorflow.keras.layers import Conv1D, BatchNormalization, LSTM, Bidirectional, Dense, Masking
 import tensorflow as tf
 
+from .base_model import BaseModel
 from .layers.cnn_blocks import CNN1DBlock
 
 
@@ -14,79 +14,47 @@ def get_cnn(filters: int, kernel_size: int, stride: int = 1, activation: str = '
     ])
 
 
-class Wav2Letter(Model):
-
-    def __init__(self, n_classes: int, activation: str = 'relu', **kwargs):
-        super().__init__(**kwargs)
-        self.activation = activation
-        self.conv_layers = [
-            get_cnn(250, 48, stride=2, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(250, 7, stride=1, activation=self.activation),
-            get_cnn(2000, 32, stride=1, activation=self.activation),
-            get_cnn(2000, 1, stride=1, activation=self.activation),
-            get_cnn(n_classes, 1, stride=1, activation=self.activation),
-        ]
-
-    def call(self, x, training=False, **kwargs):
-        for cnn in self.conv_layers:
-            x = cnn(x, training=training)
-        x = tf.reduce_mean(x, axis=1)
-        x = tf.nn.softmax(x, axis=-1)
-        return x
-
-    def get_config(self):
-        super().get_config()
-
-
-class CNN1DLSTM(Model):
+class CNN1DLSTM(BaseModel):
     def __init__(
             self,
-            n_classes: int,
-            num_channels: List[int] = [64, 64, 128, 128],
-            kernel_sizes: List[int] = [4, 3, 3, 3],
-            pool_sizes: List[int] = [2, 2, 2, 2],
-            bidirectional: bool = True,
-            rnn_units: List[int] = [128],
-            norm_method: str = 'layer',
-            dropout: float = 0.5,
+            config: Dict[str, Any] = None,
             **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(config, **kwargs)
 
-        self.num_channels = num_channels
-        self.kernel_sizes = kernel_sizes
-        self.pool_sizes = pool_sizes
-        self.bidirectional = bidirectional
-        self.rnn_units = rnn_units
-        self.n_classes = n_classes
-        self.dropout = dropout
+        if config is None:
+            config = {}
+        self.n_classes = config.get('n_classes', 4)
+        self.num_channels = config.get('num_channels', [64, 64, 128, 128])
+        self.kernel_sizes = config.get('kernel_sizes', [4, 3, 3, 3])
+        self.pool_sizes = config.get('pool_sizes', [2, 2, 2, 2])
+        self.bidirectional = config.get('bidirectional', True)
+        self.rnn_units = config.get('rnn_units', [128])
+        self.norm_method = config.get('norm_method', 'layer')
+        self.dropout = config.get('dropout', 0.)
 
         # CNN layers
-        assert len(num_channels) == len(kernel_sizes) == len(
-            pool_sizes), 'Number of channel / kernel / pool sizes mismatch: {}, {} and {}'.format(len(num_channels),
-                                                                                                  len(kernel_sizes),
-                                                                                                  len(pool_sizes))
+        assert len(self.num_channels) == len(self.kernel_sizes) == len(
+            self.pool_sizes), \
+            f'Number of channel / kernel / pool sizes mismatch: {len(self.num_channels)}, ' \
+            f'{len(self.kernel_sizes)} and {len(self.pool_sizes)}'
+
         self.cnn_layers = [CNN1DBlock(
             n_channel=c,
             kernel_size=k,
             pool_size=p,
-            norm_method=norm_method
-        ) for c, k, p in zip(num_channels, kernel_sizes, pool_sizes)]
+            norm_method=self.norm_method
+        ) for c, k, p in zip(self.num_channels, self.kernel_sizes, self.pool_sizes)]
 
         # RNN layer
         self.recurrent_layers = [
-            LSTM(unit, return_sequences=True) if i != len(rnn_units)-1 else LSTM(unit)
-            for i, unit in enumerate(rnn_units)
+            LSTM(unit, return_sequences=True) if i != len(self.rnn_units)-1 else LSTM(unit)
+            for i, unit in enumerate(self.rnn_units)
         ]
-        if bidirectional:
+
+        if self.bidirectional:
             self.recurrent_layers = [Bidirectional(layer) for layer in self.recurrent_layers]
         # logits layer
-        self.logits = Dense(n_classes)
+        self.logits = Dense(self.n_classes)
 
     def get_config(self):
         return {'num_channels': self.num_channels,
@@ -116,11 +84,12 @@ class CNN1DLSTM(Model):
         return tf.nn.softmax(x, axis=-1)
 
 
-class TestModel(Model):
+class TestModel(BaseModel):
 
-    def __init__(self, n_classes: int = 4, **kwargs):
-        super().__init__(**kwargs)
-        self.logits = Dense(n_classes)
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        super().__init__(config, **kwargs)
+        self.n_classes = config.get('n_classes', 4)
+        self.logits = Dense(self.n_classes)
 
     def call(self, x, **kwargs):
         x = tf.reduce_mean(x, axis=1)

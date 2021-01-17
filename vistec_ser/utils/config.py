@@ -36,3 +36,4 @@ class Config:
     def __init__(self, path: str):
         config = load_yaml(path)
         self.feature_config = config.get('feature_config', {})
+        self.model_config = config.get('model_config', {})

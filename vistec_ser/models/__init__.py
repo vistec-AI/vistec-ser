@@ -1,1 +1,1 @@
-from .network import CNN1DLSTM, TestModel, Wav2Letter
+from .network import CNN1DLSTM, TestModel
