@@ -35,7 +35,7 @@ def main(argv):
     batch_size = 2
     config = Config(path=config_path)
 
-    test_slicedataloader(config=Config, batch_size=batch_size, csv_path=csv_path)
+    test_slicedataloader(config=config, batch_size=batch_size, csv_path=csv_path)
 
 
 if __name__ == '__main__':
