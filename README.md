@@ -24,11 +24,10 @@ cd vistec-ser
 python setup.py install
 ```
 
-### Docker
-*TODO*
-
 ## Usage
 ### Train with Your Own Data
+We provide Google Colaboratory example for training `Emo-DB` dataset using our repository.
+
 [![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wc9CUuGrQHw29o3g9Iy-Wmjksebgtmau?usp=sharing)
 
 #### Preparing Data
@@ -49,11 +48,11 @@ For training a model, create a `DataLoader` object and use method `.get_dataset`
 for training. `DataLoader` will also use `FeatureLoader` which will read `config.yml`. 
 The dataset will automatically pad a batch according to the longest sequence length.
 
-### Inferencing using pretrained weight
+### Inferencing
 *TODO*
 
 ## Reference
-This repository was structured based on [TensorflowASR](https://github.com/TensorSpeech/TensorFlowASR) repository by 
+This repository structure was inspired by [TensorflowASR](https://github.com/TensorSpeech/TensorFlowASR) by 
 Huy Le Nguyen ([@usimarit](https://github.com/usimarit)). Please check it out!
 
 
