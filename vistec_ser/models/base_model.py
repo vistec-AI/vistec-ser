@@ -39,7 +39,7 @@ class BaseModel(Model, ABC):
             T = self.specaugment_params.get('T', 30)
             nT = self.specaugment_params.get('nT', 2)
             F = self.specaugment_params.get('F', 5)
-            nF = self.specaugment_params('nF', 1)
+            nF = self.specaugment_params.get('nF', 1)
             specaugment_fn = lambda sample: apply_specaugment(sample, T=T, n_T=nT, F=F, n_F=nF)
             x = tf.map_fn(specaugment_fn, x)
 
