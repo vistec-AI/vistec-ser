@@ -28,12 +28,14 @@ class BaseModel(Model, ABC):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(**kwargs)
-        self.specaugment_params = config.get('spec_augment', None)
+        if config is None:
+            config = {}
+        self.specaugment_params = config.get('spec_augment', {})
 
     def train_step(self, data):
         data = data_adapter.expand_1d(data)
         x, y, sample_weight = data_adapter.unpack_x_y_sample_weight(data)
-        if self.specaugment_params is not None:
+        if len(self.specaugment_params) > 0:
             T = self.specaugment_params.get('T', 30)
             nT = self.specaugment_params.get('nT', 2)
             F = self.specaugment_params.get('F', 5)
