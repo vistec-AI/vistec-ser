@@ -11,3 +11,11 @@ feature_config:
     min_alpha: 0.9
     max_alpha: 1.1
     alpha_step: 0.1
+
+model_config:
+  spec_augment:
+    T: 10
+    F: 5
+    nT: 1
+    nF: 1
+  n_classes: 4
