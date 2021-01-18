@@ -18,7 +18,10 @@ def test_dataloader(config: Config, batch_size: int, csv_path: str):
     validation_steps = val_loader.steps_per_epoch
 
     model = TestModel(config.model_config)
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=[WeightedAccuracy(), UnweightedAccuracy()])
+    model.compile(
+        loss='sparse_categorical_crossentropy',
+        optimizer='adam',
+        metrics=[WeightedAccuracy(), UnweightedAccuracy(n_classes=4)])
     model.fit(
         train_dataset,
         validation_data=val_dataset,
