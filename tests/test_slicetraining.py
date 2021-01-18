@@ -20,7 +20,7 @@ def test_slicedataloader(config: Config, batch_size: int, csv_path: str):
     model.compile(
         loss='sparse_categorical_crossentropy',
         optimizer='adam',
-        metrics=[WeightedAccuracy(), UnweightedAccuracy(ืn_classes=4)])
+        metrics=[WeightedAccuracy(), UnweightedAccuracy(n_classes=4)])
     model.fit(
         X_train,
         y_train,
