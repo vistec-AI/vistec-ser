@@ -10,7 +10,7 @@ requirements = [
 
 setuptools.setup(
     name="vistec-ser",
-    version="0.2.2a",
+    version="0.2.2a2",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
     description="Speech Emotion Recognition models and training using Tensorflow 2.x",
