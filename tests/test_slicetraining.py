@@ -1,5 +1,5 @@
 from vistec_ser.datasets import DataLoader, FeatureLoader, SliceDataLoader
-from vistec_ser.evaluation.metrics import WeightedAccuracy, UnweightedAccuracy
+from vistec_ser.evaluation.metrics import weighted_accuracy, unweighted_accuracy, compute_confusion_matrix
 from vistec_ser.utils.config import Config
 from vistec_ser.models import TestModel
 import sys
@@ -29,6 +29,11 @@ def test_slicedataloader(config: Config, batch_size: int, csv_path: str):
         validation_steps=validation_steps,
         epochs=1
     )
+
+    y_pred = model(X_train)
+    wa = weighted_accuracy(y_train, y_pred)
+    ua = unweighted_accuracy(y_train, y_pred)
+    cm = compute_confusion_matrix(y_train, y_pred)
 
 
 def main(argv):
