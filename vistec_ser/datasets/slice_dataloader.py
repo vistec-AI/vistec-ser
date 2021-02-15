@@ -31,6 +31,8 @@ class SliceDataLoader(DataLoader):
             features = self.feature_loader.extract(waveform)
             if self.n_frames is not None:
                 chunks = chop_feature(features, n_frames=self.n_frames, thresh=self.thresh, pad_fn=self.pad_fn)
+            else:
+                chunks = features
             label = tf.argmax(tf.stack([tf.equal(emotion, e) for e in EMOTIONS], axis=-1))
             return chunks, label
 
