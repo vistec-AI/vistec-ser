@@ -29,6 +29,8 @@ class CNN1DLSTM(BaseModel):
         self.pool_sizes = config.get('pool_sizes', [2, 2, 2, 2])
         self.bidirectional = config.get('bidirectional', True)
         self.rnn_units = config.get('rnn_units', [128])
+        if isinstance(self.rnn_units, int):
+            self.rnn_units = [self.rnn_units]
         self.norm_method = config.get('norm_method', 'layer')
         self.dropout = config.get('dropout', 0.)
 

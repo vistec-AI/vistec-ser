@@ -1,5 +1,5 @@
 from vistec_ser.datasets import DataLoader, FeatureLoader
-from vistec_ser.evaluation.metrics import WeightedAccuracy, UnweightedAccuracy
+from vistec_ser.evaluation.metrics import weighted_accuracy, unweighted_accuracy, compute_confusion_matrix
 from vistec_ser.utils.config import Config
 from vistec_ser.models import TestModel
 import sys
@@ -21,7 +21,7 @@ def test_dataloader(config: Config, batch_size: int, csv_path: str):
     model.compile(
         loss='sparse_categorical_crossentropy',
         optimizer='adam',
-        metrics=[WeightedAccuracy(), UnweightedAccuracy(n_classes=4)])
+        metrics=['acc'])
     model.fit(
         train_dataset,
         validation_data=val_dataset,
