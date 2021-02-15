@@ -1,0 +1,28 @@
+feature_config:
+  sample_rate: 16000
+  frame_length: 50
+  frame_shift: 10
+  num_mel_bins: 40
+  feature_type: fbank
+  preemphasis: 0.97
+  scale_normalize: True
+  max_length: 3000
+  vtlp:
+    min_alpha: 0.9
+    max_alpha: 1.1
+    alpha_step: 0.1
+
+model_config:
+  spec_augment:
+    T: 10
+    F: 5
+    nT: 1
+    nF: 1
+  n_classes: 4
+  num_channels: 64, 64, 128, 128
+  kernel_sizes: 4, 3, 3, 3
+  pool_sizes: 2, 2, 2, 2
+  bidirectional: True
+  rnn_units: 128
+  norm_method: "layer"
+  dropout: 0.
