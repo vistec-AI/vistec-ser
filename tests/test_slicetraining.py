@@ -31,9 +31,9 @@ def test_slicedataloader(config: Config, batch_size: int, csv_path: str):
     )
 
     y_pred = model(X_train)
-    wa = weighted_accuracy(y_train, y_pred)
-    ua = unweighted_accuracy(y_train, y_pred)
-    cm = compute_confusion_matrix(y_train, y_pred)
+    _ = weighted_accuracy(y_train, y_pred)
+    _ = unweighted_accuracy(y_train, y_pred)
+    _ = compute_confusion_matrix(y_train, y_pred)
 
 
 def main(argv):
