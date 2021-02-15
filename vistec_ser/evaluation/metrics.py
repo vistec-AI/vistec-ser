@@ -29,7 +29,11 @@ def get_emotion_indices(y: tf.Tensor, emotion_index: int) -> tf.Tensor:
 
 
 def compute_confusion_matrix(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
-    return tf.math.confusion_matrix(y_true, y_pred)
+    if len(tf.shape(y_true)) > 1:
+        y_true = tf.argmax(y_true, axis=-1)
+    if len(tf.shape(y_pred)) > 1:
+        y_pred = tf.argmax(y_pred, axis=-1)
+    return tf.math.confusion_matrix(y_true, y_pred, dtype=tf.float32)
 
 
 def normalize_confusion_matrix(confusion_matrix: tf.Tensor, axis: int = 1) -> tf.Tensor:
