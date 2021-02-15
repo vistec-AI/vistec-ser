@@ -12,7 +12,7 @@ def evaluate_slice_model(
         X_test: Union[List[tf.Tensor], tf.Tensor],
         y_test: tf.Tensor,
         mode: str = 'chunk', **kwargs) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-    n_samples = tf.shape(X_test)[0]
+    n_samples = len(X_test)
     y_pred = tf.TensorArray(tf.int64, size=0, dynamic_size=True)
     for i in tf.range(n_samples):
         x_test = X_test[i]
