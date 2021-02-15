@@ -7,7 +7,7 @@ from .features.featureloader import FeatureLoader
 from .features.preprocessing import load_waveform
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
-EMOTIONS = ['neutral', 'anger', 'sadness', 'happiness']
+EMOTIONS = ['neutral', 'anger', 'happiness', 'sadness']
 
 
 class DataLoader:
