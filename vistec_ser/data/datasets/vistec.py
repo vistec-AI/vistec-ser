@@ -46,8 +46,7 @@ class VISTEC(object):
             if not os.path.exists(f"{f}.zip"):
                 print(f">downloading {f}.zip ...")
                 out_name = os.path.join(self.download_root, f"{f}.zip")
-                gdown.download("", output=out_name)
-                gdown.download(f"https://drive.google/uc?id={gid}")
+                gdown.download("https://drive.google/uc?id={gid}", output=out_name, quiet=False)
             else:
                 print(f"{f}.zip existed, skipping...")
         print("Finished Downloading Dataset\n")
