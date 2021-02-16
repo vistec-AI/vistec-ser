@@ -2,12 +2,10 @@ from glob import glob
 from typing import Dict, List, Union
 import json
 import os
-import subprocess
 
+import gdown
 import numpy as np
 import pandas as pd
-
-import vistec_ser
 
 
 emo2idx = {emo: i for i, emo in enumerate(['Neutral', 'Angry', 'Happy', 'Sad', 'Frustrated'])}
@@ -19,6 +17,61 @@ correctemo = {
     'Sad': 'Sadness',
     'Frustrated': 'Frustration'
 }
+
+
+class VISTEC(object):
+    def __init__(self, agreement_threshold: float = 0.7):
+        self.agreement_threshold = agreement_threshold
+        self.download_root = "~/vistec-ser_tmpfiles"
+        if not os.path.exists(self.download_root):
+            os.makedirs(self.download_root)
+        self.download_ids = {
+            "studio1-10": "1M69xuXhPE6YRFWatm0D4MiDi1blLNy0P",
+            "studio11-20": "1MqEestPscu2ao_jKUdM9HLva4DZFxCXe",
+            "studio21-30": "1lHhMEDs4YhnsGdKYBKbvidhFert_XF74",
+            "studio31-40": "1-AOy30Lm0yEnK_Q44QrSsgQN-XBKmfoW",
+            "studio41-50": "16iRYWn614AQjZoWlW9-Vc9f6TW_1Z4Ii",
+            "studio51-60": "1YX3Xus9hJEfbhww1mHOG_osLJho9yFBf",
+            "zoom1-10": "1-2QGXwfsDFfEqDl4KQ5jLPtDmbzuSc7z",
+            "zoom11-20": "17DXFur1ZAA7IAkX4-xa0OHyDTRa_KmZP",
+            "labels": "1Ym3Go5mN_5jCmvV7H3bpNnctk_tRqhNb",
+        }
+
+    def download(self):
+        # download
+        print("+-----------------------------------+")
+        print("| Downloading dataset...            |")
+        print("+-----------------------------------+\n")
+        for f, gid in self.download_ids.items():
+            if not os.path.exists(f"{f}.zip"):
+                print(f">downloading {f}.zip ...")
+                out_name = os.path.join(self.download_root, f"{f}.zip")
+                gdown.download("", output=out_name)
+                gdown.download(f"https://drive.google/uc?id={gid}")
+            else:
+                print(f"{f}.zip existed, skipping...")
+        print("Finished Downloading Dataset\n")
+
+        # extract
+        print("+-----------------------------------+")
+        print("| Extracting dataset...             |")
+        print("+-----------------------------------+\n")
+        for f in glob(f"{self.download_root}/*.zip"):
+            print(f">unzipping {f}...")
+            os.system(f"unzip -q {f}")
+
+        # format
+        print("+-----------------------------------+")
+        print("| Formatting labels...              |")
+        print("+-----------------------------------+\n")
+        labels = []
+        for json_path in glob("labels/*.json"):
+            print(f">formatting {json_path} ...")
+            json_df = generate_csv(
+                json_path=json_path,
+                agreement_threshold=self.agreement_threshold)
+            labels.append(json_df)
+        return labels
 
 
 # read JSON
@@ -64,39 +117,11 @@ def convert_to_hardlabel(agreement_dist: List[float], thresh: float = 0.7) -> Un
 def get_labels(agreements: Dict[str, np.array], thresh: float = 0.7) -> pd.DataFrame:
     return pd.DataFrame([(k.replace('.wav', ''), correctemo[idx2emo[v]]) for k, v in
                          {k: convert_to_hardlabel(v, thresh=thresh) for k, v in agreements.items()}.items() if v != -1],
-                        columns=['audio_name', 'emotion'])
+                        columns=['PATH', 'EMOTION'])
 
 
-def generate_csv(json_path, csv_path, agreement_threshold):
+def generate_csv(json_path, agreement_threshold) -> pd.DataFrame:
     data = read_json(json_path)
     agreements = get_agreements(data)
     labels = get_labels(agreements, thresh=agreement_threshold)
-    if os.path.exists(csv_path):
-        print('WARNING: CSV files already exists. Replacing...')
-    labels.to_csv(csv_path, index=False)
-
-
-class VISTEC:
-    def __init__(self, agreement_threshold: float = 0.7):
-        self.download_script = "download_vistec.sh"
-        self.agreement_threshold = agreement_threshold
-
-    def format_label(self):
-        print("+-----------------------------------+")
-        print("| Formatting labels...              |")
-        print("+-----------------------------------+\n")
-        for json_path in glob("labels/*.json"):
-            print(f">formatting {json_path} ...")
-            csv_path = os.path.basename(json_path).replace('json', 'csv')
-            generate_csv(
-                json_path=json_path,
-                csv_path=csv_path,
-                agreement_threshold=self.agreement_threshold)
-        os.system("cat *.csv | sort -u > labels.csv")
-        os.system("mv studio*.csv zoom*.csv labels")
-
-    def download(self):
-        module_root = vistec_ser.__path__[0]
-        executable = os.path.join(module_root, f"data/datasets/{self.download_script}")
-        assert os.path.exists(executable)
-        subprocess.call(['sh', executable])
+    return labels
