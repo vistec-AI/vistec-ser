@@ -37,7 +37,7 @@ To train with your own data, you need to prepare 2 files:
 2. `labels.csv` - This will be a `.csv` file containing 2 columns mapping audio path to its emotion.
     - **Your `.csv` file should contain a header** (as we will skip the first line when reading).
     - **Currently, we only support 5 emotions (`neutral`, `anger`, `happiness`, `sadness`, and `frustration`) if
-    you want to add more, modify `EMOTIONS` variable in [dataloader.py](vistec_ser/datasets/dataloader.py)**
+    you want to add more, modify `EMOTIONS` variable in [dataloader.py](vistec_ser/data/dataloader.py)**
       
 #### Preparing a model
 Now, prepare your model, you can implement your own model using `tf.keras.Sequential` or using provided model

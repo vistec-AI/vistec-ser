@@ -6,11 +6,12 @@ requirements = [
     "numpy>=1.19.2,<1.20.0",
     "soundfile>=0.10.3",
     "PyYAML>=5.3.1",
+    "gdown>=3.12.2"
 ]
 
 setuptools.setup(
     name="vistec-ser",
-    version="0.3.0a1",
+    version="0.3.1a1",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
     description="Speech Emotion Recognition models and training using Tensorflow 2.x",
