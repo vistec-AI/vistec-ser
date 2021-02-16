@@ -1,5 +1,4 @@
-from vistec_ser.datasets import DataLoader, FeatureLoader
-from vistec_ser.evaluation.metrics import weighted_accuracy, unweighted_accuracy, compute_confusion_matrix
+from vistec_ser.data import DataLoader, FeatureLoader
 from vistec_ser.utils.config import Config
 from vistec_ser.models import TestModel
 import sys
