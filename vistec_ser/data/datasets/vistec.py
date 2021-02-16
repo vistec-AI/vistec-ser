@@ -1,4 +1,5 @@
 from glob import glob
+from socket import gaierror
 from typing import Dict, List, Union
 import json
 import os
@@ -53,7 +54,7 @@ class VISTEC(object):
                 out_name = os.path.join(self.download_root, f"{f}.zip")
                 try:
                     gdown.download("https://drive.google/uc?id={gid}", output=out_name, quiet=False)
-                except ConnectionError:
+                except gaierror:
                     if f in self.github_url.keys():
                         os.system(f"wget {self.github_url[f]} -O {out_name}")
             else:
