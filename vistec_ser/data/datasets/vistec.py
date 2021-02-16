@@ -36,6 +36,11 @@ class VISTEC(object):
             "zoom11-20": "17DXFur1ZAA7IAkX4-xa0OHyDTRa_KmZP",
             "labels": "1Ym3Go5mN_5jCmvV7H3bpNnctk_tRqhNb",
         }
+        self.github_url = {
+            k: f"https://github.com/vistec-AI/dataset-releases/releases/download/v0.1/{k}.zip"
+            for k in self.download_ids.keys()
+            if k != "labels"
+        }
 
     def download(self):
         # download
@@ -46,7 +51,11 @@ class VISTEC(object):
             if not os.path.exists(f"{f}.zip"):
                 print(f">downloading {f}.zip ...")
                 out_name = os.path.join(self.download_root, f"{f}.zip")
-                gdown.download("https://drive.google/uc?id={gid}", output=out_name, quiet=False)
+                try:
+                    gdown.download("https://drive.google/uc?id={gid}", output=out_name, quiet=False)
+                except ConnectionError:
+                    if f in self.github_url.keys():
+                        os.system(f"wget {self.github_url[f]} -O {out_name}")
             else:
                 print(f"{f}.zip existed, skipping...")
         print("Finished Downloading Dataset\n")
