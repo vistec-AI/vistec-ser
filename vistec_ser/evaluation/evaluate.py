@@ -27,6 +27,25 @@ def evaluate_slice_model(
     return wa, ua, cm
 
 
+def evaluate_testloader(
+        model: BaseModel,
+        test_dataset: tf.data.Dataset,
+        n_steps: int) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+    test_iter = iter(test_dataset)
+    y_pred, y_true = [], []
+    for i in range(n_steps):
+        x, y = next(test_iter)
+        y_hat = tf.argmax(model(x), axis=-1)
+        y_true.append(y)
+        y_pred.append(y_hat)
+    y_true = tf.concat(y_true, axis=0)
+    y_pred = tf.concat(y_pred, axis=0)
+    wa = weighted_accuracy(y_true, y_pred)
+    ua = unweighted_accuracy(y_true, y_pred)
+    cm = compute_confusion_matrix(y_true, y_pred)
+    return wa, ua, cm
+
+
 def evaluate_chunk(model: BaseModel, x_test: tf.Tensor, n_frames: int = 300) -> tf.Tensor:
     chunk_test = chop_feature(x_test, n_frames=n_frames)
     y_pred = tf.argmax(tf.reduce_mean(model(chunk_test, training=False), axis=0), axis=-1)

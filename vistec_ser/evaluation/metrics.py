@@ -17,7 +17,7 @@ def weighted_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
 def unweighted_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor, n_classes: int = 4) -> tf.Tensor:
     cm = compute_confusion_matrix(y_true, y_pred)
     cm = normalize_confusion_matrix(cm)
-    return tf.reduce_mean(tf.linalg.diag(cm))
+    return tf.reduce_mean(tf.linalg.diag_part(cm))
 
 
 def get_emotion_indices(y: tf.Tensor, emotion_index: int) -> tf.Tensor:
@@ -37,7 +37,7 @@ def normalize_confusion_matrix(confusion_matrix: tf.Tensor, axis: int = 1) -> tf
         return confusion_matrix / tf.reduce_sum(confusion_matrix, axis=0)
     elif axis == 1:
         cm_transpose = tf.transpose(confusion_matrix, (1, 0))
-        norm_cm_transpose = cm_transpose / tf.reduce_sum(cm_transpose, axis=1)
+        norm_cm_transpose = cm_transpose / tf.reduce_sum(confusion_matrix, axis=1)
         return tf.transpose(norm_cm_transpose, (1, 0))
     else:
         raise ValueError("Invalid `axis` argument. Only 0 or 1 available")
