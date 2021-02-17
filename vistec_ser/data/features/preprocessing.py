@@ -1,6 +1,7 @@
 from typing import Callable, Union, List
 
 import tensorflow as tf
+import tensorflow_io as tfio
 
 from .padding import pad_dup
 
@@ -9,12 +10,14 @@ def load_waveform(
         audio: str,
         bit_depth: int = 16,
         dither: float = 1.) -> tf.Tensor:
+    normalize_factor = (2 ** bit_depth) / 2
     audio_binary = tf.io.read_file(audio)
-    waveform, sr = tf.audio.decode_wav(audio_binary)
-    # if sr != sample_rate:
-    #     raise ValueError(f"Expected sampling rate of {sample_rate} but got {sr}")
+    if '.wav' in audio:
+        waveform, _ = tf.audio.decode_wav(audio_binary)
+    elif '.flac' in audio:
+        waveform = tf.divide(tfio.audio.decode_flac(audio_binary, dtype=tf.int16), normalize_factor)
     waveform = tf.squeeze(waveform, axis=-1)
-    waveform = waveform + tf.random.normal(tf.shape(waveform), stddev=(dither / 2 ** bit_depth))
+    waveform = waveform + tf.random.normal(tf.shape(waveform), stddev=(dither / normalize_factor))
     return waveform
 
 
