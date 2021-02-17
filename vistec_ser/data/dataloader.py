@@ -40,7 +40,6 @@ class DataLoader:
         dataset = tf.data.Dataset.from_tensor_slices(data)
         return self.process_dataset(dataset, batch_size=batch_size)
 
-    @tf.function
     def preprocess(self, data):
         audio_path = data[0]
         emotion = data[1]
