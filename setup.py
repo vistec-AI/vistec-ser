@@ -2,7 +2,7 @@ import setuptools
 
 requirements = [
     "tensorflow>=2.4.0",
-    "tensorflow_io>=0.17",
+    "tensorflow-io>=0.17",
     "numpy>=1.19.2,<1.20.0",
     "soundfile>=0.10.3",
     "PyYAML>=5.3.1",
