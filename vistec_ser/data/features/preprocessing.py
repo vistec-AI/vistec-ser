@@ -17,9 +17,9 @@ def load_waveform(
     #     waveform, _ = tf.audio.decode_wav(audio_binary)
     # elif '.flac' in audio:
     #     waveform = tf.divide(tfio.audio.decode_flac(audio_binary, dtype=tf.int16), normalize_factor)
-    audio_tensor = tfio.audio.AudioIOTensor(filename=audio, dtype=tf.int64)
+    audio_tensor = tf.cast(tfio.audio.AudioIOTensor(filename=audio, dtype=tf.int64).to_tensor(), tf.float32)
     audio_rate = audio_tensor.rate
-    waveform = tf.divide(audio_tensor.to_tensor(), normalize_factor)
+    waveform = tf.divide(audio_tensor, normalize_factor)
     waveform = tf.squeeze(waveform, axis=-1)
     if not tf.equal(audio_rate, sample_rate):
         waveform = tfio.audio.resample(waveform, audio_rate, sample_rate)
