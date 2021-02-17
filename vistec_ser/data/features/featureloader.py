@@ -64,7 +64,7 @@ class FeatureLoader:
         spectrogram = self.stft(waveform)
         return dbscale(spectrogram)
 
-    def make_fbank(self, waveform: tf.Tensor, fmin: float = 0., fmax: float = 8000.) -> tf.Tensor:
+    def make_fbank(self, waveform: tf.Tensor, fmin: float, fmax: float) -> tf.Tensor:
         spectrogram = self.stft(waveform)
         mel_fbank = tf.signal.linear_to_mel_weight_matrix(
             num_mel_bins=self.num_mel_bins,
@@ -76,7 +76,7 @@ class FeatureLoader:
         return dbscale(fbank)
 
     def make_mfcc(self, waveform: tf.Tensor) -> tf.Tensor:
-        log_mel_spectrogram = self.make_fbank(waveform)
+        log_mel_spectrogram = self.make_fbank(waveform, fmin=0., fmax=self.sample_rate // 2)
         return tf.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
 
     def extract(self, waveform: tf.Tensor) -> tf.Tensor:
@@ -88,7 +88,7 @@ class FeatureLoader:
         elif self.feature_type == "spectrogram":
             features = self.make_spectrogram(waveform)
         elif self.feature_type == "fbank":
-            features = self.make_fbank(waveform)
+            features = self.make_fbank(waveform, fmin=0., fmax=self.sample_rate // 2)
         elif self.feature_type == "mfcc":
             features = self.make_mfcc(waveform)
         else:
