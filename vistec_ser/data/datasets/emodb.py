@@ -2,23 +2,29 @@ from glob import glob
 import os
 
 import pandas as pd
+import wget
 
 
 class EmoDB(object):
-    def __init__(self, agreement_threshold: float = 0.7):
-        self.agreement_threshold = agreement_threshold
-        self.download_root = f"{os.path.expanduser('~')}/vistec-ser_tmpfiles/emodb"
+    def __init__(self, download_dir: str = None):
+        if download_dir is None:
+            self.download_root = f"{os.path.expanduser('~')}/vistec-ser_tmpfiles/emodb"
+        else:
+            self.download_root = f"{download_dir}/vistec-ser_tmpfiles/emodb"
         if not os.path.exists(self.download_root):
             os.system(f"mkdir -p {self.download_root}")
         self.download_url = "http://www.emodb.bilderbar.info/download/download.zip"
-        self.emotion_mappings = {'N': 'neutral', 'W': 'anger', 'F':'happiness', 'T': 'sadness'}
+        self.emotion_mappings = {'N': 'neutral', 'W': 'anger', 'F': 'happiness', 'T': 'sadness'}
         self.label_path = f"{self.download_root}/labels.csv"
 
     def download(self):
         # download
-        os.system(f"wget {self.download_url} -q --show-progress -O {self.download_root}/download.zip")
+        print(">downloading dataset...")
+        wget.download(url=self.download_url, out=f"{self.download_root}/download.zip", bar=wget.bar_adaptive)
         # unzip
+        print(">unzipping data...")
         os.system(f"unzip -q {self.download_root}/download.zip -d {self.download_root}/emo-db")
+        print(">preparing labels...")
         labels = ["PATH, EMOTION\n"]
         for wav in glob(f"{self.download_root}/emo-db/*/*.wav"):
             key = wav.split('.')[0][-2]

@@ -1,39 +1,35 @@
 from typing import Callable, List
 
 import tensorflow as tf
+import torch
 
 
-def pad_dup(x: tf.Tensor, max_len: tf.Tensor) -> tf.Tensor:
+def pad_dup(x: torch.Tensor, max_len: int) -> torch.Tensor:
     """Pad an Arguments feature upto specified length.
     The Arguments is repeated until max_len is reached.
     """
-    time_dim = tf.cast(tf.shape(x)[0], tf.float32)
-
-    temp = tf.identity(x)
-    num_repeat = tf.floor(max_len / time_dim)
-    remainder = tf.cast(max_len - (num_repeat * time_dim), tf.int64)
-    x_rem = x[:remainder, :]
-    for _ in tf.range(num_repeat-1):
-        x = tf.concat([x, temp], axis=0)
-    x_pad = tf.concat([x, x_rem], axis=0)
+    time_dim = x.shape[-1]
+    tmp = x.clone()
+    num_repeat = int(max_len / time_dim)
+    remainder = max_len - num_repeat * time_dim
+    x_rem = x[:, :remainder]
+    for _ in range(num_repeat - 1):
+        x = torch.cat([x, tmp], dim=-1)
+    x_pad = torch.cat([x, x_rem], dim=-1)
     return x_pad
 
 
-def pad_zero(x: tf.Tensor, max_len: tf.Tensor) -> tf.Tensor:
+def pad_zero(x: torch.Tensor, max_len: int) -> torch.Tensor:
     """Pad Arguments feature up to specified length.
     The padded values are zero.
     Arguments
     """
-    time_dim, freq_dim = tf.shape(x)[0], tf.shape(x)[1]
-    time_dim = tf.cast(time_dim, tf.float32)
-    freq_dim = tf.cast(freq_dim, tf.float32)
-
-    zeros = tf.zeros((max_len - time_dim, freq_dim))
-    x_pad = tf.concat([x, zeros], axis=0)
+    zeros = torch.zeros([x.shape[0], max_len - x.shape[1]])
+    x_pad = torch.cat([x, zeros], dim=-1)
     return x_pad
 
 
-def pad_X(X: List[tf.Tensor], pad_fn: Callable, max_len: int = None) -> tf.Tensor:
+def pad_X(X: List[torch.Tensor], pad_fn: Callable, max_len: int = None) -> tf.Tensor:
     """Pad a pack of array to a specified max_len.
     If max_len is not specified, longest preprocessing will
     be use as a max length. This function is used to
@@ -41,6 +37,6 @@ def pad_X(X: List[tf.Tensor], pad_fn: Callable, max_len: int = None) -> tf.Tenso
     Arguments
     """
     if not max_len:
-        max_len = tf.cast(tf.maximum([tf.shape(x)[0] for x in X]), tf.float32)
+        max_len = max([x.shape[-1] for x in X])
     out = [pad_fn(x, max_len) for x in X]
-    return tf.convert_to_tensor(out)
+    return torch.stack(out)
