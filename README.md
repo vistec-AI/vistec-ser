@@ -1,6 +1,6 @@
 # Vistec-AIS Speech Emotion Recognition
 ![python-badge](https://img.shields.io/badge/python-%3E%3D3.6-blue?logo=python)
-![tensorflow-badge](https://img.shields.io/badge/tensorflow-%3E%3D2.4.0-orange?logo=tensorflow)
+![pytorch-badge](https://img.shields.io/badge/pytorch-%3E%3D1.7.1-red?logo=pytorch)
 ![license](	https://img.shields.io/github/license/tann9949/vistec-ser)
 
 ![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
@@ -9,7 +9,7 @@
 ![Code Grade](https://www.code-inspector.com/project/17426/status/svg)
 ![Code Quality Score](https://www.code-inspector.com/project/17426/score/svg)
 
-Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
+Speech Emotion Recognition Model and Inferencing using Pytorch
 
 ## Installation
 ### From Pypi
@@ -50,11 +50,6 @@ The dataset will automatically pad a batch according to the longest sequence len
 
 ### Inferencing
 *TODO*
-
-## Reference
-This repository structure was inspired by [TensorflowASR](https://github.com/TensorSpeech/TensorFlowASR) by 
-Huy Le Nguyen ([@usimarit](https://github.com/usimarit)). Please check it out!
-
 
 ## Author & Sponsor
 [![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
