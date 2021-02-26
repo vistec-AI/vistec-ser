@@ -1,19 +1,11 @@
-import tensorflow as tf
-import sys
+import os
+
+import yaml
 
 
-def float_feature(list_of_floats):
-    return tf.train.Feature(float_list=tf.train.FloatList(value=list_of_floats))
-
-
-def int64_feature(list_of_ints):
-    return tf.train.Feature(int64_list=tf.train.Int64List(value=list_of_ints))
-
-
-def bytestring_feature(list_of_bytestrings):
-    return tf.train.Feature(bytes_list=tf.train.BytesList(value=list_of_bytestrings))
-
-
-def print_one_line(*args):
-    tf.print("\033[K", end="")
-    tf.print("\r", *args, sep="", end=" ", output_stream=sys.stdout)
+def load_yaml(config_path: str) -> dict:
+    assert isinstance(config_path, str), "argument must be string"
+    assert os.path.exists(config_path), f"config at `{config_path}` does not exists"
+    assert config_path.split(".")[-1] in ["yaml", "yml"], f"Config file `{config_path}`"
+    config = yaml.load(open(config_path, "r", encoding="utf-8"), Loader=yaml.SafeLoader)
+    return config

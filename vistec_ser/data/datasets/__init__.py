@@ -1,1 +1,0 @@
-from .vistec import VISTEC

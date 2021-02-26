@@ -1,6 +1,5 @@
 from typing import Callable, List
 
-import tensorflow as tf
 import torch
 
 
@@ -29,7 +28,7 @@ def pad_zero(x: torch.Tensor, max_len: int) -> torch.Tensor:
     return x_pad
 
 
-def pad_X(X: List[torch.Tensor], pad_fn: Callable, max_len: int = None) -> tf.Tensor:
+def pad_X(X: List[torch.Tensor], pad_fn: Callable, max_len: int = None) -> torch.Tensor:
     """Pad a pack of array to a specified max_len.
     If max_len is not specified, longest preprocessing will
     be use as a max length. This function is used to

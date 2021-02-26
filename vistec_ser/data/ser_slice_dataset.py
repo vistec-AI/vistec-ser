@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union, List, Dict
 
 import pandas as pd
 import torch
@@ -18,14 +18,14 @@ class SERSliceDataset(Dataset):
 
     def __init__(
             self,
-            csv_file: str,
+            csv_file: Union[str, pd.DataFrame],
             max_len: int,
             len_thresh: float = 0.5,
             pad_fn: Callable = pad_dup,
             sampling_rate: int = 16000,
             center_feats: bool = True,
-            scale_feats: bool = False,
-            vad: bool = False,  # experimental
+            scale_feats: bool = True,
+            emotions=None,
             transform=None):
         """
         Args:
@@ -38,22 +38,26 @@ class SERSliceDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        assert isinstance(csv_file, str)
+        if emotions is None:
+            self.emotions = ["neutral", "anger", "happiness", "sadness"]
+        self.n_classes = len(self.emotions)
         assert isinstance(max_len, int)
         assert isinstance(sampling_rate, int)
         self.sampling_rate = sampling_rate
-        self.max_len = max_len
+        self.max_len = max_len * 100
         self.len_thresh = len_thresh
         self.pad_fn = pad_fn
         self.transform = transform
         self.normalize = NormalizeSample(center_feats, scale_feats)
-        if vad:
-            self.vad = torchaudio.transforms.Vad(sample_rate=self.sampling_rate, trigger_level=6)
-        else:
-            self.vad = None
         self.samples = self._load_csv(csv_file)
 
-    def _chop_sample(self, sample):
+    def _chop_sample(self, sample: torch.Tensor) -> List[torch.Tensor]:
+        """Chop spectrogram (or any 2-D Tensor) into smaller chunks based on `self.max_len`.
+        Each chunk is normalized according to object's config (center_feats, scale_feats)s
+
+        :param sample: Input tensor. Can be either spectrogram or fbank
+        :return: a list of chopped samples
+        """
         x, y = sample["feature"], sample["emotion"]
         _, time_dim = x.shape
         x_chopped = list()
@@ -79,23 +83,27 @@ class SERSliceDataset(Dataset):
                 x_chopped.append(self.normalize({"feature": xi, "emotion": y}))
         return x_chopped
 
-    def _load_feature(self, audio_path):
+    def _load_feature(self, audio_path: str) -> torch.Tensor:
         audio, sample_rate = torchaudio.backend.sox_backend.load(audio_path)
 
         # initial preprocess
         # convert to mono, resample, truncate
         audio = torch.unsqueeze(audio.mean(dim=0), dim=0)  # convert to mono
-        if self.vad:
-            audio = self.vad(self.vad(audio).flip(dims=[1])).flip(dims=[1])  # this VAD is quite slow
         if sample_rate != self.sampling_rate:
             audio = kaldi.resample_waveform(audio, orig_freq=sample_rate, new_freq=self.sampling_rate)
         return audio
 
-    def _load_csv(self, csv_file):
-        csv = pd.read_csv(csv_file)
+    def _load_csv(self, csv_file: Union[str, pd.DataFrame]) -> List[Dict[str, torch.Tensor]]:
+        if isinstance(csv_file, str):
+            csv = pd.read_csv(csv_file)
+        else:
+            csv = csv_file
         print("Extracting Features...")
         samples = []
         for i, (path, emotion) in tqdm(csv.iterrows(), total=len(csv)):
+            if emotion.lower().strip() not in self.emotions:
+                continue
+            emotion = self.emotions.index(emotion.lower().strip())  # convert to label
             sample = self.transform({"feature": self._load_feature(path), "emotion": emotion})
             samples += self._chop_sample(sample)
         return samples
@@ -112,22 +120,31 @@ class SERSliceDataset(Dataset):
 class SERSliceTestDataset(SERSliceDataset):
     def __init__(
             self,
-            csv_file: str,
+            csv_file: Union[str, pd.DataFrame],
+            max_len: int,
             center_feats: bool = True,
             scale_feats: bool = False,
+            emotions=None,
             transform=None):
         super().__init__(
             csv_file=csv_file,
-            max_len=-1,
+            max_len=max_len,
             center_feats=center_feats,
             scale_feats=scale_feats,
+            emotions=emotions,
             transform=transform)
 
     def _load_csv(self, csv_file):
-        csv = pd.read_csv(csv_file)
+        if isinstance(csv_file, str):
+            csv = pd.read_csv(csv_file)
+        else:
+            csv = csv_file
         print("Extracting Features...")
         samples = []
         for i, (path, emotion) in tqdm(csv.iterrows(), total=len(csv)):
-            sample = {"feature": self._load_feature(path), "emotion": emotion}
-            samples += [self.normalize(self.transform(sample))]
+            if emotion.lower().strip() not in self.emotions:
+                continue
+            emotion = self.emotions.index(emotion.lower().strip())  # convert to label
+            sample = self.transform({"feature": self._load_feature(path), "emotion": emotion})
+            samples.append(self._chop_sample(sample))
         return samples

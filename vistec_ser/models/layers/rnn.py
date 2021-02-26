@@ -1,66 +1,64 @@
-from typing import List
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
 
-from tensorflow.keras.layers import Bidirectional, LSTM, GRU, SimpleRNN, TimeDistributed, Dense, Layer
-import tensorflow as tf
 
-
-class BiPyramidRNN(Layer):
-    def __init__(self,
-                 units: int,
-                 n_layers: int,
-                 rnn_type: str = 'lstm'):
+class PyramidLSTM(nn.Module):
+    def __init__(
+            self,
+            input_dim: int,
+            hidden_dim: int,
+            bidirectional: bool = True,
+            dropout: float = 0.):
         super().__init__()
-        if rnn_type == 'lstm':
-            self.rnn_stack = [Bidirectional(LSTM(units, return_sequences=True)) for _ in range(n_layers)]
-        elif rnn_type == 'gru':
-            self.rnn_stack = [Bidirectional(GRU(units, return_sequences=True)) for _ in range(n_layers)]
-        elif rnn_type == 'rnn':
-            self.rnn_stack = [Bidirectional(SimpleRNN(units, return_sequences=True)) for _ in range(n_layers)]
-        else:
-            raise NameError('Unrecognized rnn_type: {}'.format(rnn_type))
+        self.rnn = nn.LSTM(
+            input_size=input_dim * 2,
+            hidden_size=hidden_dim,
+            bidirectional=bidirectional,
+            dropout=dropout,
+            batch_first=True
+        )
 
-    def call(self, x, **kwargs):
-        i = 0
-        for rnn in self.rnn_stack:
-            if i == 0:
-                x = rnn(x)
-            else:
-                if tf.shape(x)[1] % 2 == 1:
-                    shape = tf.shape(x)
-                    pad = tf.zeros([shape[0], 1, shape[-1]])
-                    x = tf.concat([x, pad], axis=1)
-                x = tf.concat([x[:, 0::2, :], x[:, 1::2, :]], axis=-1)
-                x = rnn(x)
-            i += 1
-        return x
+    def forward(self, x: torch.Tensor):
+        batch_size, time_dim, feat_dim = x.shape
+        x = x.contiguous().view(batch_size, int(time_dim / 2), feat_dim * 2)  # stack features
+        x, (h, c) = self.rnn(x)
+        return x, (h, c)
 
 
-class AttentiveRNN(Layer):
-    def __init__(self,
-                 units: List[int] = [128],
-                 recurrent_type: str = 'gru',
-                 bidirectional: bool = True):
+class AttentiveRNN(nn.Module):
+    def __init__(
+            self,
+            input_dim: int,
+            hidden_dim: int,
+            output_dim: int,
+            bidirectional: bool = True,
+            dropout: float = 0.):
         super().__init__()
-        if recurrent_type == 'gru':
-            self.RNNs = [GRU(unit, return_sequences=True) for unit in units]
-        elif recurrent_type == 'lstm':
-            self.RNNs = [LSTM(unit, return_sequences=True) for unit in units]
-        elif recurrent_type == 'rnn':
-            self.RNNs = [SimpleRNN(unit, return_sequences=True) for unit in units]
-        else:
-            raise NameError('Unknown recurrent type: {}'.format(recurrent_type))
+        self.rnn = nn.LSTM(
+            input_size=input_dim,
+            hidden_size=hidden_dim,
+            bidirectional=bidirectional,
+            dropout=dropout,
+            batch_first=True
+        )
+        self.logits = nn.Linear(hidden_dim, output_dim)
 
-        if bidirectional:
-            self.RNNs = [Bidirectional(layer) for layer in self.RNNs]
+    def dot_attention(self, keys: torch.Tensor, query: torch.Tensor):
+        """
+        alpha = softmax(qK) * V
+        where
+            - q (query) is LSTM last hidden states
+            - K (keys) = V (values) are LSTM sequence
+        """
+        query = query.squeeze(0)
+        attn_weights = torch.bmm(keys, query.unsqueeze(2)).squeeze(2)
+        attn_weights = F.softmax(attn_weights, dim=1)
+        output = torch.bmm(keys.transpose(1, 2), attn_weights.unsqueeze(2)).squeeze(2)
+        return output
 
-        self.f_attn = TimeDistributed(Dense(1, activation='tanh'))
-
-    def call(self, x, training=False, return_attn=True, **kwargs):
-        for rnn in self.RNNs:
-            x = rnn(x)
-
-        attn_score = tf.nn.softmax(self.f_attn(x), axis=1)
-        x = tf.reduce_sum(x * attn_score, axis=1)
-        if return_attn:
-            return x, attn_score
+    def forward(self, x):
+        x, (h, c) = self.rnn(x)
+        x = self.dot_attention(x, h)
+        x = self.logits(x)
         return x

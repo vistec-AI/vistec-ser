@@ -1,52 +1,69 @@
-from abc import ABC
-from typing import Dict, Any
-
-import tensorflow as tf
-import tensorflow_io as tfio
-from tensorflow.python.eager import backprop
-from tensorflow.python.keras.engine import data_adapter
-from tensorflow.keras.models import Model
+import torch
+import pytorch_lightning as pl
+import torch.nn.functional as F
+from pytorch_lightning.metrics import functional as FM
+from torch.optim.lr_scheduler import ExponentialLR
+from torch.optim import Adam
 
 
-def apply_specaugment(
-        x: tf.Tensor,
-        T: float = 30,
-        F: float = 5,
-        n_T: int = 2,
-        n_F: int = 1,
-        mask_value: float = 0.) -> tf.Tensor:
-    for _ in range(n_F):
-        x = tfio.experimental.audio.freq_mask(x, param=F)
-    for _ in range(n_T):
-        x = tfio.experimental.audio.time_mask(x, param=T)
-    if mask_value:
-        x = tf.where(tf.equal(x, 0), tf.ones_like(x) * mask_value, x)
-    return x
-
-
-class BaseModel(Model, ABC):
-
-    def __init__(self, config: Dict[str, Any], **kwargs):
+class BaseModel(pl.LightningModule):
+    def __init__(self, hparams, **kwargs):
         super().__init__(**kwargs)
-        if config is None:
-            config = {}
-        self.specaugment_params = config.get('spec_augment', {})
+        self.hparams = hparams
+        
+    def forward(self, *args, **kwargs):
+        raise NotImplementedError()
 
-    def train_step(self, data):
-        data = data_adapter.expand_1d(data)
-        x, y, sample_weight = data_adapter.unpack_x_y_sample_weight(data)
-        if len(self.specaugment_params) > 0:
-            T = self.specaugment_params.get('T', 30)
-            nT = self.specaugment_params.get('nT', 2)
-            F = self.specaugment_params.get('F', 5)
-            nF = self.specaugment_params.get('nF', 1)
-            specaugment_fn = lambda sample: apply_specaugment(sample, T=T, n_T=nT, F=F, n_F=nF)
-            x = tf.map_fn(specaugment_fn, x)
+    def training_step(self, batch, batch_idx):
+        x, y = batch["feature"], batch["emotion"]
+        y_hat = self(x)
+        loss = F.cross_entropy(y_hat, y)
+        preds = torch.argmax(y_hat, dim=-1)
+        acc = FM.accuracy(preds, y)
+        metrics = {"train_loss": loss, "train_acc": acc}
+        self.log_dict(metrics, prog_bar=True, logger=True)
+        return loss
 
-        with backprop.GradientTape() as tape:
-            y_pred = self(x, training=True)
-            loss = self.compiled_loss(
-                y, y_pred, sample_weight, regularization_losses=self.losses)
-        self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
-        self.compiled_metrics.update_state(y, y_pred, sample_weight)
-        return {m.name: m.result() for m in self.metrics}
+    def validation_step(self, batch, batch_idx):
+        x, y = batch["feature"], batch["emotion"]
+        y_hat = self(x)
+        loss = F.cross_entropy(y_hat, y)
+        preds = torch.argmax(y_hat, dim=-1)
+        acc = FM.accuracy(preds, y)
+        metrics = {"val_acc": acc, "val_loss": loss}
+        self.log_dict(metrics, prog_bar=True, logger=True)
+        return metrics
+
+    def test_step(self, batch, batch_idx):
+        metrics = self.validation_step(batch, batch_idx)
+        metrics = {'test_acc': metrics['val_acc'], 'test_loss': metrics['val_loss']}
+        self.log_dict(metrics, prog_bar=True, logger=True)
+
+    def configure_optimizers(self):
+        opt = Adam(self.parameters(), lr=self.hparams.learning_rate)
+        return opt
+
+
+class BaseSliceModel(BaseModel):
+
+    def __init__(self, hparams, **kwargs):
+        super().__init__(hparams, **kwargs)
+
+    def forward(self, *args, **kwargs):
+        raise NotImplementedError()
+
+    def validation_step(self, batch, batch_idx):
+        emotion = batch[0]["emotion"]
+        loss = 0.
+        final_logits = []
+        for chunk in batch:
+            logits = self(chunk["feature"])  # dim=(1, 4)
+            ce_loss = F.cross_entropy(logits, emotion)
+            final_logits.append(logits[0])
+            loss += ce_loss
+        prediction = torch.stack(final_logits).mean(dim=0).argmax(dim=-1, keepdim=True)
+        acc = FM.accuracy(prediction, emotion)
+        loss = loss / len(batch)
+        metrics = {"val_acc": acc, "val_loss": loss}
+        self.log_dict(metrics)
+        return metrics

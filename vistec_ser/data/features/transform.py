@@ -31,8 +31,6 @@ class Spectrogram(object):
             "sample_frequency": sample_frequency,
             "dither": dither
         }
-        self.center_feats = center_feats
-        self.scale_feats = scale_feats
 
     def __call__(self, sample):
         audio, emotion = sample["feature"], sample["emotion"]
@@ -55,7 +53,6 @@ class FilterBank(object):
             dither (float, optional) – Dithering constant (0.0 means no dither). If you turn this off, you should set the energy_floor option, e.g. to 1.0 or 0.1 (Default: 0.0)
             high_freq (float, optional) – High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: 0.0)
             low_freq (float, optional) – Low cutoff frequency for mel bins (Default: 20.0)
-            vtln_warp (float, optional) – Vtln warp factor (only applicable if vtln_map not specified) (Default: 1.0)
         """
 
     def __init__(
@@ -113,8 +110,10 @@ class NormalizeSample(object):
     def __call__(self, sample):
         feature, emotion = sample["feature"], sample["emotion"]
         if self.center_feats:
+            # feature = feature - feature.mean(dim=0)
             feature = feature - torch.unsqueeze(feature.mean(dim=-1), dim=-1)
         if self.scale_feats:
+            # feature = feature / torch.sqrt(feature.var(dim=0) + 1e-8)
             feature = feature / torch.sqrt(torch.unsqueeze(feature.var(dim=-1), dim=-1) + 1e-8)
         return {"feature": feature, "emotion": emotion}
 

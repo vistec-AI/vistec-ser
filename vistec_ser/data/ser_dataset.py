@@ -1,8 +1,12 @@
+from typing import Union
+
 import pandas as pd
 import torch
 import torchaudio
 from torch.utils.data import Dataset
 from torchaudio.compliance import kaldi
+
+from .features.padding import pad_dup
 
 
 class SERDataset(Dataset):
@@ -12,9 +16,10 @@ class SERDataset(Dataset):
 
     def __init__(
             self,
-            csv_file: str,
+            csv_file: Union[str, pd.DataFrame],
             max_len: int,
             sampling_rate: int = 16000,
+            emotions=None,
             transform=None):
         """
         Args:
@@ -25,10 +30,18 @@ class SERDataset(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
-        assert isinstance(csv_file, str)
         assert isinstance(max_len, int)
         assert isinstance(sampling_rate, int)
-        self.audios = pd.read_csv(csv_file)
+        if emotions is None:
+            self.emotions = ["neutral", "anger", "happiness", "sadness"]
+        else:
+            self.emotions = emotions
+        if isinstance(csv_file, str):
+            self.audios = pd.read_csv(csv_file)
+        else:
+            self.audios = csv_file
+        self.audios = self.audios[self.audios["EMOTION"].str.lower().isin(self.emotions)]
+        self.n_classes = len(self.emotions)
         self.sampling_rate = sampling_rate
         self.max_len = max_len
         self.transform = transform
@@ -50,10 +63,22 @@ class SERDataset(Dataset):
         audio = torch.unsqueeze(audio.mean(dim=0), dim=0)  # convert to mono
         if sample_rate != self.sampling_rate:
             audio = kaldi.resample_waveform(audio, orig_freq=sample_rate, new_freq=self.sampling_rate)
-        audio = audio[:self.sampling_rate * self.max_len]
 
+        # emotion to label
+        emotion = self.emotions.index(emotion.lower().strip())
+
+        # extract features
         sample = {'feature': audio, 'emotion': emotion}
         if self.transform:
             sample = self.transform(sample)
+        feature = sample["feature"]
+
+        # truncated
+        sequence_length = self.max_len * 100  # 100 frame = 1 sec
+        if feature.shape[-1] > sequence_length:
+            feature = feature[:, :sequence_length]
+        else:
+            feature = pad_dup(feature, sequence_length)
+        sample = {"feature": feature, "emotion": emotion}
 
         return sample
