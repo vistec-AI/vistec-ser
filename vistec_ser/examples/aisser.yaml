@@ -2,7 +2,7 @@ aisser:
   test_fold: 0
   agreement_threshold: 0.7
   slice_dataset: True
-  include_zoom: True
+  include_zoom: False
   sampling_rate: 16000
   num_mel_bins: 40
   frame_length: 50
@@ -12,7 +12,7 @@ aisser:
   scale_feats: True
   mic_type: con
   download_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset"
-  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp_zoom"
+  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp"
   batch_size: 64
   emotions: [neutral, anger, happiness, sadness]
 
