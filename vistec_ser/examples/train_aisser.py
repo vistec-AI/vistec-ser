@@ -62,17 +62,11 @@ def evaluate_slice_model(
 def run_fold(fold: int, config_path: str, n_iter: int = 25):
     # load dataset & model
     config = load_yaml(config_path)
-
     hparams, aisser_module = read_config(config, test_fold=fold)
-    trainer_config = config.get("trainer", {})
-
     aisser_module.set_fold(fold)  # set fold to evaluate
-    if aisser_module.slice_dataset:
-        model = CNN1DLSTMSlice(hparams)
-    else:
-        model = CNN1DLSTMSlice(hparams)
 
     # trainer
+    trainer_config = config.get("trainer", {})
     callbacks = [
         pl.callbacks.ModelCheckpoint(
             save_top_k=5,
@@ -90,6 +84,9 @@ def run_fold(fold: int, config_path: str, n_iter: int = 25):
     open(f"{aisser_module.experiment_dir}/results.txt", "w").write("WeightedAccuracy,UnweightedAccuracy\n")
     open(f"{aisser_module.experiment_dir}/confusion_matrix.txt", "w").write("")
     for i in range(n_iter):
+        # reset model
+        model = CNN1DLSTMSlice(hparams)
+
         # trainer
         logger = TensorBoardLogger(
             save_dir=aisser_module.experiment_dir,
@@ -121,6 +118,7 @@ def main(arguments):
     config = load_yaml(config_path)
     aisser_config = config.get("aisser", {})
     aisser_module = AISSERDataModule(**aisser_config)
+    aisser_module.prepare_data()
 
     for fold in aisser_module.fold_config.keys():
         print(f"\n+-----------------------------------------+")
