@@ -246,28 +246,27 @@ class AISSERDataModule(pl.LightningDataModule):
             print("\n+-----------------------------------+")
             print("| Formatting labels...              |")
             print("+-----------------------------------+")
-            labels = []
-            for json_path in sorted(glob(f"{self.download_root}/*.json")):
-                print(f">formatting {json_path} ...")
-                data = read_json(json_path)
-                # Filter studio that doesn't appear in download_dir
-                avail_studio = []
-                for std in sorted(glob(f"{self.download_root}/*/")):
-                    std = std[:-1].split("/")[-1]
-                    std = std[0] + std[-3:]
-                    avail_studio.append(std)
-                data = {k: v for k, v in data.items() if k.split("_")[0] in avail_studio}
 
-                agreements = get_agreements(data)
-                json_df = pd.DataFrame([
-                    (f"{self._get_audio_path(k)}", correctemo[idx2emo[v]])
-                    for k, v in {k: convert_to_hardlabel(v, thresh=self.agreement_threshold)
-                                 for k, v in agreements.items()}.items()
-                    if v != -1
-                ], columns=['PATH', 'EMOTION'])
-                labels.append(json_df)
-            labels = pd.concat(labels)
-            # for i, (path, emotion) in labels.iterrows():
+            json_path = f"{self.download_root}/labels.json"
+            if not os.path.exists(json_path):
+                raise FileNotFoundError(f"labels.json not found at {self.download_root}")
+
+            print(f">formatting {json_path} ...")
+            data = read_json(json_path)
+            # Filter studio that doesn't appear in download_dir
+            avail_studio = []
+            for std in sorted(glob(f"{self.download_root}/*/")):
+                std = std[:-1].split("/")[-1]
+                std = std[0] + std[-3:]
+                avail_studio.append(std)
+            data = {k: v for k, v in data.items() if k.split("_")[0] in avail_studio}
+            agreements = get_agreements(data)
+            labels = pd.DataFrame([
+                (f"{self._get_audio_path(k)}", correctemo[idx2emo[v]])
+                for k, v in {k: convert_to_hardlabel(v, thresh=self.agreement_threshold)
+                             for k, v in agreements.items()}.items()
+                if v != -1
+            ], columns=['PATH', 'EMOTION'])
 
             labels.to_csv(f"{self.download_root}/labels.csv", index=False)
         else:
