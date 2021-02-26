@@ -252,7 +252,7 @@ class AISSERDataModule(pl.LightningDataModule):
                 data = read_json(json_path)
                 # Filter studio that doesn't appear in download_dir
                 avail_studio = []
-                for std in sorted(glob("/Users/chompk/WORK/AIResearch/VISTEC-dataset/vistec-ser_tmpfiles/vistec/*/")):
+                for std in sorted(glob(f"{self.download_root}/*/")):
                     std = std[:-1].split("/")[-1]
                     std = std[0] + std[-3:]
                     avail_studio.append(std)
