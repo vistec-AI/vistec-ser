@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 import torch
 
 from vistec_ser.models.base_model import BaseSliceModel
-from vistec_ser.models.network import CNN1DLSTMSlice
+from vistec_ser.models.network import CNN1DLSTMSlice, CNN1DLSTMAttentionSlice
 from vistec_ser.data.datasets.aisser import AISSERDataModule
 from vistec_ser.utils.utils import load_yaml
 warnings.filterwarnings("ignore")
@@ -20,6 +20,7 @@ def run_parser() -> argparse.Namespace:
     parser.add_argument("--config-path", "-cp",
                         default="examples/aisser.yaml", type=str, help="Path to training config file")
     parser.add_argument("--n-iter", "-n", default=25, type=int, help="Number of iteration")
+    parser.add_argument("--attention", action="store_true", help="State whether to use attention LSTM or not")
     return parser.parse_args()
 
 
@@ -59,7 +60,7 @@ def evaluate_slice_model(
     return wa, ua, cm
 
 
-def run_fold(fold: int, config_path: str, n_iter: int = 25):
+def run_fold(fold: int, config_path: str, n_iter: int = 25, use_attn=False):
     # load dataset & model
     config = load_yaml(config_path)
     hparams, aisser_module = read_config(config, test_fold=fold)
@@ -85,7 +86,7 @@ def run_fold(fold: int, config_path: str, n_iter: int = 25):
     open(f"{aisser_module.experiment_dir}/confusion_matrix.txt", "w").write("")
     for i in range(n_iter):
         # reset model
-        model = CNN1DLSTMSlice(hparams)
+        model = CNN1DLSTMAttentionSlice(hparams) if use_attn else CNN1DLSTMSlice(hparams)
 
         # trainer
         logger = TensorBoardLogger(
@@ -115,6 +116,8 @@ def run_fold(fold: int, config_path: str, n_iter: int = 25):
 
 def main(arguments):
     config_path = arguments.config_path
+    use_attn = arguments.attention
+
     config = load_yaml(config_path)
     aisser_config = config.get("aisser", {})
     aisser_module = AISSERDataModule(**aisser_config)
@@ -124,7 +127,7 @@ def main(arguments):
         print(f"\n+-----------------------------------------+")
         print(f"| Experiment on fold {fold:02d}                   |")
         print(f"+-----------------------------------------+\n")
-        run_fold(fold, config_path)
+        run_fold(fold, config_path, use_attn=use_attn)
 
 
 if __name__ == '__main__':

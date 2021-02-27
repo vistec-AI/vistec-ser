@@ -26,7 +26,7 @@ class PyramidLSTM(nn.Module):
         return x, (h, c)
 
 
-class AttentiveRNN(nn.Module):
+class AttentionLSTM(nn.Module):
     def __init__(
             self,
             input_dim: int,
@@ -42,6 +42,8 @@ class AttentiveRNN(nn.Module):
             dropout=dropout,
             batch_first=True
         )
+        if bidirectional:
+            hidden_dim = hidden_dim * 2
         self.logits = nn.Linear(hidden_dim, output_dim)
 
     def dot_attention(self, keys: torch.Tensor, query: torch.Tensor):
@@ -51,7 +53,8 @@ class AttentiveRNN(nn.Module):
             - q (query) is LSTM last hidden states
             - K (keys) = V (values) are LSTM sequence
         """
-        query = query.squeeze(0)
+        batch_size = query.shape[1]
+        query = query.reshape(batch_size, -1)
         attn_weights = torch.bmm(keys, query.unsqueeze(2)).squeeze(2)
         attn_weights = F.softmax(attn_weights, dim=1)
         output = torch.bmm(keys.transpose(1, 2), attn_weights.unsqueeze(2)).squeeze(2)

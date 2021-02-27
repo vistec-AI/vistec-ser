@@ -12,7 +12,7 @@ aisser:
   scale_feats: True
   mic_type: con
   download_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset"
-  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp"
+  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp_attn"
   batch_size: 64
   emotions: [neutral, anger, happiness, sadness]
 
