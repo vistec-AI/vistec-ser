@@ -1,5 +1,0 @@
-PATH, EMOTION
-tests/samples/neu.wav,neutral
-tests/samples/ang.wav,anger
-tests/samples/hap.wav,happiness
-tests/samples/sad.wav,sadness

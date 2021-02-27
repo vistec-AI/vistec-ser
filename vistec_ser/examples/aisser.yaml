@@ -2,7 +2,6 @@ aisser:
   test_fold: 0
   agreement_threshold: 0.7
   slice_dataset: True
-  include_zoom: False
   sampling_rate: 16000
   num_mel_bins: 40
   frame_length: 50
