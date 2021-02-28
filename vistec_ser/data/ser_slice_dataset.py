@@ -122,6 +122,7 @@ class SERSliceTestDataset(SERSliceDataset):
             self,
             csv_file: Union[str, pd.DataFrame],
             max_len: int,
+            sampling_rate: int = 16000,
             center_feats: bool = True,
             scale_feats: bool = False,
             emotions=None,
@@ -129,6 +130,7 @@ class SERSliceTestDataset(SERSliceDataset):
         super().__init__(
             csv_file=csv_file,
             max_len=max_len,
+            sampling_rate=sampling_rate,
             center_feats=center_feats,
             scale_feats=scale_feats,
             emotions=emotions,
@@ -146,5 +148,41 @@ class SERSliceTestDataset(SERSliceDataset):
                 continue
             emotion = self.emotions.index(emotion.lower().strip())  # convert to label
             sample = self.transform({"feature": self._load_feature(path), "emotion": emotion})
+            samples.append(self._chop_sample(sample))
+        return samples
+
+
+class SERInferenceDataset(SERSliceDataset):
+    def __init__(
+            self,
+            csv_file: Union[str, pd.DataFrame],
+            max_len: int,
+            sampling_rate: int = 16000,
+            center_feats: bool = True,
+            scale_feats: bool = False,
+            emotions=None,
+            transform=None):
+        super().__init__(
+            csv_file=csv_file,
+            max_len=max_len,
+            sampling_rate=sampling_rate,
+            center_feats=center_feats,
+            scale_feats=scale_feats,
+            emotions=emotions,
+            transform=transform)
+
+    def _load_csv(self, csv_file):
+        if isinstance(csv_file, str):
+            csv = pd.read_csv(csv_file)
+        else:
+            csv = csv_file
+        print("Extracting Features...")
+        samples = []
+        for i, path in csv.iterrows():
+            path = path["PATH"]
+            # not a good practice to fill field emotion with PATH
+            # but this is the easiest way to load and transform data without any
+            # additional pipelines. Might consider fix in future
+            sample = self.transform({"feature": self._load_feature(path), "emotion": path})
             samples.append(self._chop_sample(sample))
         return samples

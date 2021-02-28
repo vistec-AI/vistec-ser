@@ -17,7 +17,7 @@ class EmoDB(object):
         self.emotion_mappings = {'N': 'neutral', 'W': 'anger', 'F': 'happiness', 'T': 'sadness'}
         self.label_path = f"{self.download_root}/labels.csv"
 
-    def download(self):
+    def _download(self):
         # download
         print(">downloading dataset...")
         wget.download(url=self.download_url, out=f"{self.download_root}/download.zip", bar=wget.bar_adaptive)
@@ -35,8 +35,9 @@ class EmoDB(object):
             labels.append(f"{wav},{emotion}\n")
         open(self.label_path, "w").writelines(labels)
 
-    def get_labels(self):
+    def _prepare_labels(self):
         if not os.path.exists(self.label_path):
-            self.download()
+            self._download()
             assert os.path.exists(self.label_path)
-        return pd.read_csv(self.label_path)
+        labels = pd.read_csv(self.label_path)
+        labels.to_csv(f"{self.download_root}/labels.csv")

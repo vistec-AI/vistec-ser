@@ -5,8 +5,8 @@ from pytorch_lightning.loggers import TensorBoardLogger
 import pytorch_lightning as pl
 
 from vistec_ser.models.network import CNN1DLSTMSlice
-from vistec_ser.examples.train_aisser import read_config, evaluate_slice_model
-from vistec_ser.utils.utils import load_yaml
+from vistec_ser.evaluation.evaluate import evaluate_slice_model
+from vistec_ser.utils.utils import load_yaml, read_config
 warnings.filterwarnings("ignore")
 
 

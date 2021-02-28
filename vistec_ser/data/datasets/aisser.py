@@ -11,9 +11,8 @@ import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 
-from ..ser_dataset import SERDataset
-from ..ser_slice_dataset import SERSliceDataset, SERSliceTestDataset
-from ..features.transform import FilterBank, SpecAugment
+from ..ser_slice_dataset import SERSliceDataset, SERSliceTestDataset, SERInferenceDataset
+from ..features.transform import FilterBank
 
 emo2idx = {emo: i for i, emo in enumerate(['Neutral', 'Angry', 'Happy', 'Sad', 'Frustrated'])}
 idx2emo = {v: k for k, v in emo2idx.items()}
@@ -31,7 +30,6 @@ class AISSERDataModule(pl.LightningDataModule):
             self,
             test_fold: int,
             agreement_threshold: float = 0.7,
-            slice_dataset: bool = True,
             sampling_rate: int = 16000,
             num_mel_bins: int = 40,
             frame_length: int = 50,  # in ms
@@ -55,9 +53,6 @@ class AISSERDataModule(pl.LightningDataModule):
         self.agreement_threshold = agreement_threshold
         self.mic_type = mic_type
         self.test_fold = test_fold
-
-        # dataset type
-        self.slice_dataset = slice_dataset
 
         # dataset config
         self.max_len = max_len
@@ -102,6 +97,8 @@ class AISSERDataModule(pl.LightningDataModule):
             "studio31-40": "1-AOy30Lm0yEnK_Q44QrSsgQN-XBKmfoW",
             "studio41-50": "16iRYWn614AQjZoWlW9-Vc9f6TW_1Z4Ii",
             "studio51-60": "1YX3Xus9hJEfbhww1mHOG_osLJho9yFBf",
+            # "studio61-70": "",
+            # "studio71-80": "",
             "zoom1-10": "1-2QGXwfsDFfEqDl4KQ5jLPtDmbzuSc7z",
             "zoom11-20": "17DXFur1ZAA7IAkX4-xa0OHyDTRa_KmZP",
         }
@@ -158,31 +155,17 @@ class AISSERDataModule(pl.LightningDataModule):
         self.test = test_split[test_split["PATH"].apply(lambda x: x.split("/")[-3]).isin(test_studio)]
 
     def train_dataloader(self) -> DataLoader:
-        if self.slice_dataset:
-            transform = Compose([FilterBank(
-                frame_length=self.frame_length,
-                frame_shift=self.frame_shift,
-                num_mel_bins=self.num_mel_bins)])
-            train_vistec = SERSliceDataset(
-                csv_file=self.train,
-                sampling_rate=self.sampling_rate,
-                max_len=self.max_len,
-                center_feats=self.center_feats,
-                scale_feats=self.scale_feats,
-                transform=transform)
-        else:
-            transform = Compose([
-                FilterBank(
-                    frame_length=self.frame_length,
-                    frame_shift=self.frame_shift,
-                    num_mel_bins=self.num_mel_bins),
-                SpecAugment(
-                    freq_mask_param=10,
-                    time_mask_param=20,
-                    n_freq_mask=1,
-                    n_time_mask=2)])
-            train_vistec = SERDataset(
-                csv_file=self.train, sampling_rate=self.sampling_rate, max_len=self.max_len, transform=transform)
+        transform = Compose([FilterBank(
+            frame_length=self.frame_length,
+            frame_shift=self.frame_shift,
+            num_mel_bins=self.num_mel_bins)])
+        train_vistec = SERSliceDataset(
+            csv_file=self.train,
+            sampling_rate=self.sampling_rate,
+            max_len=self.max_len,
+            center_feats=self.center_feats,
+            scale_feats=self.scale_feats,
+            transform=transform)
         return DataLoader(train_vistec, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
     def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
@@ -190,15 +173,13 @@ class AISSERDataModule(pl.LightningDataModule):
                     frame_length=self.frame_length,
                     frame_shift=self.frame_shift,
                     num_mel_bins=self.num_mel_bins)])
-        if self.slice_dataset:
-            val_vistec = SERSliceTestDataset(
-                csv_file=self.val,
-                max_len=self.max_len,
-                center_feats=self.center_feats,
-                scale_feats=self.scale_feats,
-                transform=transform)
-        else:
-            val_vistec = SERDataset(csv_file=self.val, max_len=self.max_len, transform=transform)
+        val_vistec = SERSliceTestDataset(
+            csv_file=self.val,
+            sampling_rate=self.sampling_rate,
+            max_len=self.max_len,
+            center_feats=self.center_feats,
+            scale_feats=self.scale_feats,
+            transform=transform)
         return DataLoader(val_vistec, batch_size=1, num_workers=self.num_workers)
 
     def test_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
@@ -206,17 +187,37 @@ class AISSERDataModule(pl.LightningDataModule):
                     frame_length=self.frame_length,
                     frame_shift=self.frame_shift,
                     num_mel_bins=self.num_mel_bins)])
-        if self.slice_dataset:
-            test_vistec = SERSliceTestDataset(
-                csv_file=self.test,
-                max_len=self.max_len,
-                center_feats=self.center_feats,
-                scale_feats=self.scale_feats,
-                transform=transform
-            )
-        else:
-            test_vistec = SERDataset(csv_file=self.test, max_len=self.max_len, transform=transform)
+        test_vistec = SERSliceTestDataset(
+            csv_file=self.test,
+            sampling_rate=self.sampling_rate,
+            max_len=self.max_len,
+            center_feats=self.center_feats,
+            scale_feats=self.scale_feats,
+            transform=transform
+        )
         return DataLoader(test_vistec, batch_size=1, num_workers=self.num_workers)
+
+    def extract_feature(self, audio_path: Union[str, List[str]]):
+        # make audio_path List[str]
+        if isinstance(audio_path, str):
+            audio_path = [audio_path]
+        audio_df = pd.DataFrame([[a] for a in audio_path], columns=["PATH"])
+        transform = Compose([
+            FilterBank(
+                frame_length=self.frame_length,
+                frame_shift=self.frame_shift,
+                num_mel_bins=self.num_mel_bins
+            )
+        ])
+        feature_dataset = SERInferenceDataset(
+            csv_file=audio_df,
+            sampling_rate=self.sampling_rate,
+            max_len=self.max_len,
+            center_feats=self.center_feats,
+            scale_feats=self.scale_feats,
+            transform=transform
+        )
+        return DataLoader(feature_dataset, batch_size=1, num_workers=self.num_workers)
 
     def _get_audio_path(self, audio_name: str) -> str:
         if not isinstance(audio_name, str):
