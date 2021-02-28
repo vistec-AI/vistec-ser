@@ -1,3 +1,4 @@
+from glob import glob
 from typing import List
 import os
 
@@ -17,7 +18,7 @@ model, aisser_module = setup_server(temp_dir, config_path, checkpoint_path)
 
 
 def clear_audio(temp_dir: str) -> None:
-    for f in os.listdir(temp_dir):
+    for f in glob(f"{temp_dir}/*"):
         os.remove(f)
 
 
