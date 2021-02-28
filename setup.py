@@ -11,7 +11,11 @@ requirements = [
     "soundfile>=0.10.3",
     "PyYAML!=5.4.*,>=5.1",
     "gdown>=3.12.2",
-    "wget>=3.2"
+    "wget>=3.2",
+    "fastapi>=0.63.0",
+    "aiofiles>=0.6.0",
+    "python-multipart>=0.0.5",
+    "uvicorn>=0.13.4"
 ]
 
 setuptools.setup(
