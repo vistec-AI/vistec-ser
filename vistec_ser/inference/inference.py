@@ -31,4 +31,4 @@ def infer_sample(model: BaseSliceModel, sample: List[Dict[str, torch.Tensor]], e
     assert len(emotions) == len(emotion_prob), f"Number of emotion is not equal: len(emotions) = {len(emotions)}, " \
                                                f"len(final_logits) = {len(final_logits)} "
     emotion_prob = {emotion: f"{prob*100:.2f}" for emotion, prob in zip(emotions, emotion_prob)}
-    return {"name": name, "logits": emotion_prob}
+    return {"name": name, "prob": emotion_prob}
