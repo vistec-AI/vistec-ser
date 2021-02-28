@@ -44,11 +44,32 @@ python examples/train_aisser.py --config-path <path-to-config> --n-iter <number-
 ```
 
 ### Inferencing
-*TODO*
+We also implement a FastAPI backend server as an example of deploying a SER model. To run the server, run
+```shell
+cd examples
+uvicorn server:app --reload
+```
+Once the server spawn, you can do HTTP POST request in `form-data` format. and JSON will return as the following format:
+```json
+[
+  {
+    "name": <request-file-name>,
+    "prob": {
+      "neutral": <p(neu)>,
+      "anger": <p(ang)>,
+      "happiness": <p(hap)>,
+      "sadness": <p(sad)>
+    }
+  }, ...
+]
+```
+See an example below:
+
+TODO: add gif 
 
 ## Author & Sponsor
 [![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
 
 Chompakorn Chaksangchaichot
 
-Email: [chompakornc_pro@vistec.ac.th](chompakornc_pro@vistec.ac.th)
+Email: [chompakornc_pro@vistec.ac.th](`chompakornc_pro@vistec.ac.th)
