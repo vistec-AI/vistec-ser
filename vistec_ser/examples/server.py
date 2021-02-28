@@ -17,8 +17,8 @@ temp_dir = f"{temp_dir}/inference_temp"
 model, aisser_module = setup_server(temp_dir, config_path, checkpoint_path)
 
 
-def clear_audio(temp_dir: str) -> None:
-    for f in glob(f"{temp_dir}/*"):
+def clear_audio(audio_paths: List[str]) -> None:
+    for f in audio_paths:
         os.remove(f)
 
 
@@ -42,9 +42,11 @@ async def predict(audios: List[UploadFile] = File(...)):
             await f.write(content)
         audio_paths.append(save_name)
         assert os.path.exists(save_name)
+
     # extract features
     inference_loader = aisser_module.extract_feature(audio_paths)
     inference_results = [infer_sample(model, sample, emotions=aisser_module.emotions)
                          for sample in inference_loader]
-    clear_audio(temp_dir)
+
+    clear_audio(audio_paths)
     return inference_results
