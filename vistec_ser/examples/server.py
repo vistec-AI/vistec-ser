@@ -31,6 +31,8 @@ async def healthcheck():
 async def predict(audios: List[UploadFile] = File(...)):
     """
     Predict audio POST from front-end server using `form-data` files
+
+    NOTE: note that this might bug if > 1 requests are sent with the same file name
     """
     # save files
     audio_paths = []
