@@ -54,16 +54,9 @@ class BaseSliceModel(BaseModel):
 
     def validation_step(self, batch, batch_idx):
         emotion = batch[0]["emotion"]
-        loss = 0.
-        final_logits = []
-        for chunk in batch:
-            logits = self(chunk["feature"])  # dim=(1, 4)
-            ce_loss = F.cross_entropy(logits, emotion)
-            final_logits.append(logits[0])
-            loss += ce_loss
-        prediction = torch.stack(final_logits).mean(dim=0).argmax(dim=-1, keepdim=True)
-        acc = FM.accuracy(prediction, emotion)
-        loss = loss / len(batch)
+        final_logits = torch.stack([self(chunk["feature"])[0] for chunk in batch]).mean(dim=0, keepdim=True)
+        loss = F.cross_entropy(final_logits, emotion)
+        acc = FM.accuracy(final_logits.argmax(dim=-1), emotion)
         metrics = {"val_acc": acc, "val_loss": loss}
         self.log_dict(metrics)
         return metrics

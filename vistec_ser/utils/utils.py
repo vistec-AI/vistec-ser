@@ -14,11 +14,9 @@ def load_yaml(config_path: str) -> dict:
     return config
 
 
-def read_config(cfg: dict, test_fold: int = None) -> Tuple[dict, AISSERDataModule]:
+def read_config(cfg: dict, test_fold: int, include_zoom: bool) -> Tuple[dict, AISSERDataModule]:
     aisser_config = cfg.get("aisser", {})
-    if test_fold is not None:
-        aisser_config["test_fold"] = test_fold
-    aisser_module = AISSERDataModule(**aisser_config)
+    aisser_module = AISSERDataModule(test_fold=test_fold, include_zoom=include_zoom, **aisser_config)
 
     emotions = aisser_config.get("emotions", ["neutral", "anger", "happiness", "sadness"])
     in_channel = aisser_config.get("num_mel_bins", 40)

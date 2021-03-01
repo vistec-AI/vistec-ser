@@ -69,6 +69,7 @@ class AISSERDataModule(pl.LightningDataModule):
         self.scale_feats = scale_feats
 
         # config n_classes, avail emotion
+        self.include_zoom = include_zoom
         self.emotions = emotions
         self.n_classes = len(self.emotions)
 
@@ -119,10 +120,12 @@ class AISSERDataModule(pl.LightningDataModule):
             5: [f"studio{s:03d}" for s in range(51, 61)],
             # 6: [f"studio{s:03d}" for s in range(61, 71)],
             # 7: [f"studio{s:03d}" for s in range(71, 81)],
+            8: [f"zoom{s:03d}" for s in range(1, 11)],
+            9: [f"zoom{s:03d}" for s in range(11, 21)]
         }
-        if include_zoom:
-            self.fold_config[8] = [f"zoom{s:03d}" for s in range(1, 11)]
-            self.fold_config[9] = [f"zoom{s:03d}" for s in range(11, 21)]
+        # if include_zoom:
+        # self.fold_config[8] = [f"zoom{s:03d}" for s in range(1, 11)]
+        # self.fold_config[9] = [f"zoom{s:03d}" for s in range(11, 21)]
         assert self.test_fold in self.fold_config.keys()
         self.studio_list = []
         for studios in self.fold_config.values():
@@ -132,6 +135,7 @@ class AISSERDataModule(pl.LightningDataModule):
         self.train = None
         self.val = None
         self.test = None
+        self.zoom = None
 
     def set_fold(self, fold):
         self.test_fold = fold
@@ -145,14 +149,18 @@ class AISSERDataModule(pl.LightningDataModule):
         self._prepare_labels()
 
     def setup(self, *args, **kwargs):
+        train_folds = self.fold_config.keys() if self.include_zoom else list(self.fold_config.keys())[:-2]
         self.train = pd.concat([pd.read_csv(f"{self.download_root}/fold{i}.csv")
-                                for i in self.fold_config.keys() if i != self.test_fold])
+                                for i in train_folds if i != self.test_fold])
         test_split = pd.read_csv(f"{self.download_root}/fold{self.test_fold}.csv")
         test_studio = self.fold_config[self.test_fold]
         val_studio = test_studio[:len(test_studio) // 2]
         test_studio = test_studio[len(test_studio) // 2:]
         self.val = test_split[test_split["PATH"].apply(lambda x: x.split("/")[-3]).isin(val_studio)]
         self.test = test_split[test_split["PATH"].apply(lambda x: x.split("/")[-3]).isin(test_studio)]
+        if not self.include_zoom:
+            self.zoom = pd.concat([pd.read_csv(f"{self.download_root}/fold{i}.csv")
+                                   for i in list(self.fold_config.keys())[-2:] if i != self.test_fold])
 
     def train_dataloader(self) -> DataLoader:
         transform = Compose([FilterBank(
@@ -196,6 +204,21 @@ class AISSERDataModule(pl.LightningDataModule):
             transform=transform
         )
         return DataLoader(test_vistec, batch_size=1, num_workers=self.num_workers)
+
+    def zoom_dataloader(self) -> DataLoader:
+        transform = Compose([FilterBank(
+            frame_length=self.frame_length,
+            frame_shift=self.frame_shift,
+            num_mel_bins=self.num_mel_bins)])
+        zoom_vistec = SERSliceTestDataset(
+            csv_file=self.zoom,
+            sampling_rate=self.sampling_rate,
+            max_len=self.max_len,
+            center_feats=self.center_feats,
+            scale_feats=self.scale_feats,
+            transform=transform
+        )
+        return DataLoader(zoom_vistec, batch_size=1, num_workers=self.num_workers)
 
     def extract_feature(self, audio_path: Union[str, List[str]]):
         # make audio_path List[str]
