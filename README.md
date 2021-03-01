@@ -40,7 +40,7 @@ k-fold cross validation method. We provide 2 k-fold experiments: including and e
 in config file (see `examples/aisser.yaml`)
 
 ```shell
-python examples/train_aisser.py --config-path <path-to-config> --n-iter <number-of-iterations>  
+python examples/train_fold_aisser.py --config-path <path-to-config> --n-iter <number-of-iterations>  
 ```
 
 ### Inferencing
