@@ -49,6 +49,8 @@ We also implement a FastAPI backend server as an example of deploying a SER mode
 cd examples
 uvicorn server:app --reload
 ```
+You can customize the server by 
+
 Once the server spawn, you can do HTTP POST request in `form-data` format. and JSON will return as the following format:
 ```json
 [

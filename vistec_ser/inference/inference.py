@@ -10,19 +10,30 @@ from ..utils.utils import read_config, load_yaml
 from ..data.datasets.thaiser import ThaiSERDataModule
 
 
-def setup_server(temp_dir, config_path, checkpoint_path):
+def setup_server(config_path: str):
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file `{config_path}` not found.")
-    if not os.path.exists(checkpoint_path):
-        raise FileNotFoundError(f"Checkpoint `{checkpoint_path}` not found.")
+
+    config = load_yaml(config_path)
+    inference_config = config.get("inference", {})
+
+    temp_dir = inference_config.get("temp_dir", "./inference_temp")
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-    hparams, module_params = read_config(load_yaml(config_path))
+    if "checkpoint_path" not in inference_config.keys():
+        raise KeyError(f"Error: checkpoint_path not defined")
+    checkpoint_path = inference_config["checkpoint_path"]
+    if not os.path.exists(checkpoint_path):
+        raise FileNotFoundError(f"Checkpoint `{checkpoint_path}` not found.")
+
+
+    hparams, module_params = read_config(config)
     thaiser_module = ThaiSERDataModule(**module_params)
     model = CNN1DLSTMSlice.load_from_checkpoint(checkpoint_path=checkpoint_path, hparams=hparams)
     model.eval()
-    return model, thaiser_module
+
+    return model, thaiser_module, temp_dir
 
 
 def infer_sample(model: BaseSliceModel, sample: List[Dict[str, torch.Tensor]], emotions=List[str]):

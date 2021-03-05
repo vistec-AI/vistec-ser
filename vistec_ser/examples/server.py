@@ -7,13 +7,10 @@ import aiofiles
 from vistec_ser.inference.inference import infer_sample, setup_server
 
 # setup model
-temp_dir = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/"
 config_path = "thaiser.yaml"
-checkpoint_path = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp/fold0/weights/final0.ckpt"
 
 app = FastAPI()
-temp_dir = f"{temp_dir}/inference_temp"
-model, thaiser_module = setup_server(temp_dir, config_path, checkpoint_path)
+model, thaiser_module, temp_dir = setup_server(config_path)
 
 
 def clear_audio(audio_paths: List[str]) -> None:

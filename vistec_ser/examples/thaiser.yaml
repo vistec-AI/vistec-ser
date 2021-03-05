@@ -25,3 +25,7 @@ cnn1dlstm:
 trainer:
   weights_summary: full
   max_epochs: 40
+
+inference:
+  temp_dir: /Users/chompk/WORK/AIResearch/VISTEC-dataset/
+  checkpoint_path: /Users/chompk/WORK/AIResearch/VISTEC-dataset/exp/fold0/weights/final0.ckpt
