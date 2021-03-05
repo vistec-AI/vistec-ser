@@ -70,7 +70,7 @@ See an example below:
 ![server-demo](figures/server.gif)
 
 ## Author & Sponsor
-<a href="https://airesearch.in.th/" style="margin-right:50px">
+<a href="https://airesearch.in.th/" style="margin-right:100px">
 <img src="https://airesearch.in.th/assets/img/logo/airesearch-logo.svg" alt="airesearch" width="200"/>
 </a>
 <a href="https://www.ais.co.th/">
