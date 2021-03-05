@@ -8,7 +8,7 @@ from vistec_ser.inference.inference import infer_sample, setup_server
 
 # setup model
 temp_dir = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/"
-config_path = "/examples/thaiser.yaml"
+config_path = "thaiser.yaml"
 checkpoint_path = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp/fold0/weights/final0.ckpt"
 
 app = FastAPI()
