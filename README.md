@@ -63,9 +63,9 @@ Once the server spawn, you can do HTTP POST request in `form-data` format. and J
   }, ...
 ]
 ```
-See an example below:
+<!-- See an example below:
 
-TODO: add gif 
+TODO: add gif --> 
 
 ## Author & Sponsor
 [![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
