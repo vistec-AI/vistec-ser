@@ -49,7 +49,7 @@ We also implement a FastAPI backend server as an example of deploying a SER mode
 cd examples
 uvicorn server:app --reload
 ```
-You can customize the server by 
+You can customize the server by modifying `thaiser.yaml` in `inference` field.
 
 Once the server spawn, you can do HTTP POST request in `form-data` format. and JSON will return as the following format:
 ```json
@@ -65,9 +65,10 @@ Once the server spawn, you can do HTTP POST request in `form-data` format. and J
   }, ...
 ]
 ```
-<!-- See an example below:
+See an example below:
 
-TODO: add gif --> 
+![gif](figures/server.gif)
+
 
 ## Author & Sponsor
 [![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
