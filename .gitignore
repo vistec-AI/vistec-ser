@@ -1,4 +1,5 @@
 venv
+vistec-env
 .idea
 **/.DS_Store
 
@@ -8,3 +9,5 @@ build
 
 **/*.ipynb*
 **/__pycache__
+
+**/lightning_logs
