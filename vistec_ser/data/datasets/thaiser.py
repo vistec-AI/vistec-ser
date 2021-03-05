@@ -6,10 +6,10 @@ import zipfile
 
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import Compose
-import gdown
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
+import wget
 
 from ..ser_slice_dataset import SERSliceDataset, SERSliceTestDataset, SERInferenceDataset
 from ..features.transform import FilterBank
@@ -25,7 +25,7 @@ correctemo = {
 }
 
 
-class AISSERDataModule(pl.LightningDataModule):
+class ThaiSERDataModule(pl.LightningDataModule):
     def __init__(
             self,
             test_fold: int,
@@ -91,24 +91,22 @@ class AISSERDataModule(pl.LightningDataModule):
             os.makedirs(self.experiment_dir)
 
         # define download URL
-        self.download_ids = {
-            "studio1-10": "1M69xuXhPE6YRFWatm0D4MiDi1blLNy0P",
-            "studio11-20": "1MqEestPscu2ao_jKUdM9HLva4DZFxCXe",
-            "studio21-30": "1lHhMEDs4YhnsGdKYBKbvidhFert_XF74",
-            "studio31-40": "1-AOy30Lm0yEnK_Q44QrSsgQN-XBKmfoW",
-            "studio41-50": "16iRYWn614AQjZoWlW9-Vc9f6TW_1Z4Ii",
-            "studio51-60": "1YX3Xus9hJEfbhww1mHOG_osLJho9yFBf",
-            # "studio61-70": "",
-            # "studio71-80": "",
-            "zoom1-10": "1-2QGXwfsDFfEqDl4KQ5jLPtDmbzuSc7z",
-            "zoom11-20": "17DXFur1ZAA7IAkX4-xa0OHyDTRa_KmZP",
-        }
-        self.labels_id = "1-1UML7pI0A-NwzlYZMthO8lu5onsu2_y"
+        studios = []
+        version = 0.8
+        release_url = f"https://github.com/vistec-AI/dataset-releases/releases/download/v{version}"
         self.github_url = {
-            k: f"https://github.com/vistec-AI/dataset-releases/releases/download/v0.1/{k}.zip"
-            for k in self.download_ids.keys()
-            if k != "labels"
+            "studio1-10": release_url+f"/studio1-10_v{version}.zip",
+            "studio11-20": release_url+f"/studio11-20_v{version}.zip",
+            "studio21-30": release_url+f"/studio21-30_v{version}.zip",
+            "studio31-40": release_url+f"/studio31-40_v{version}.zip",
+            "studio41-50": release_url+f"/studio41-50_v{version}.zip",
+            "studio51-60": release_url+f"/studio51-60_v{version}.zip",
+            # "studio61-70": release_url+f"/studio61-70_v{version}.zip",
+            # "studio71-80": release_url+f"/studio71-80_v{version}.zip",
+            "zoom1-10": release_url+f"/zoom1-10_v{version}.zip",
+            "zoom11-20": release_url+f"/zoom11-20_v{version}.zip",
         }
+        self.labels_url = release_url+f"/emotion_label_v{version}.json"
 
         # define fold split
         self.fold_config = {
@@ -123,9 +121,6 @@ class AISSERDataModule(pl.LightningDataModule):
             8: [f"zoom{s:03d}" for s in range(1, 11)],
             9: [f"zoom{s:03d}" for s in range(11, 21)]
         }
-        # if include_zoom:
-        # self.fold_config[8] = [f"zoom{s:03d}" for s in range(1, 11)]
-        # self.fold_config[9] = [f"zoom{s:03d}" for s in range(11, 21)]
         assert self.test_fold in self.fold_config.keys()
         self.studio_list = []
         for studios in self.fold_config.values():
@@ -321,26 +316,20 @@ class AISSERDataModule(pl.LightningDataModule):
 
     def _download(self):
         # download dataset
-        if not all(os.path.exists(f"{self.download_root}/{studio}.zip") for studio in self.download_ids.keys()):
+        if not all(os.path.exists(f"{self.download_root}/{studio}.zip") for studio in self.github_url.keys()):
             print("+-----------------------------------+")
             print("| Downloading dataset...            |")
             print("+-----------------------------------+\n")
-        for f, gid in self.download_ids.items():
+        for f, download_url in self.github_url.items():
             if not os.path.exists(f"{self.download_root}/{f}.zip"):
                 print(f">downloading {f}.zip ...")
                 out_name = os.path.join(self.download_root, f"{f}.zip")
-                if f != "studio51-60":
-                    gdown.download(f"https://drive.google.com/uc?id={gid}", output=out_name, quiet=False)
-                else:
-                    if f in self.github_url.keys():
-                        os.system(f"wget {self.github_url[f]} -O {out_name}")
+                wget.download(url=download_url, out=f"{out_name}", bar=wget.bar_adaptive)
             else:
                 pass
         # download labels
         if not os.path.exists(f"{self.download_root}/labels.json"):
-            gdown.download(
-                f"https://drive.google.com/uc?id={self.labels_id}",
-                output=f"{self.download_root}/labels.json", quiet=False)
+            wget.download(url=self.labels_url, out=f"{self.download_root}/labels.json", bar=wget.bar_adaptive)
         print("Finished Downloading Dataset\n")
 
         # extract
