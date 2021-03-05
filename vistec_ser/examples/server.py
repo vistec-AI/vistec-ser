@@ -1,4 +1,3 @@
-from glob import glob
 from typing import List
 import os
 
@@ -9,12 +8,12 @@ from vistec_ser.inference.inference import infer_sample, setup_server
 
 # setup model
 temp_dir = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/"
-config_path = "/Users/chompk/PycharmProjects/VistecSER/vistec_ser/examples/aisser.yaml"
+config_path = "/examples/thaiser.yaml"
 checkpoint_path = "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp/fold0/weights/final0.ckpt"
 
 app = FastAPI()
 temp_dir = f"{temp_dir}/inference_temp"
-model, aisser_module = setup_server(temp_dir, config_path, checkpoint_path)
+model, thaiser_module = setup_server(temp_dir, config_path, checkpoint_path)
 
 
 def clear_audio(audio_paths: List[str]) -> None:
@@ -46,8 +45,8 @@ async def predict(audios: List[UploadFile] = File(...)):
         assert os.path.exists(save_name)
 
     # extract features
-    inference_loader = aisser_module.extract_feature(audio_paths)
-    inference_results = [infer_sample(model, sample, emotions=aisser_module.emotions)
+    inference_loader = thaiser_module.extract_feature(audio_paths)
+    inference_results = [infer_sample(model, sample, emotions=thaiser_module.emotions)
                          for sample in inference_loader]
 
     clear_audio(audio_paths)

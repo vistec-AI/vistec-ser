@@ -1,0 +1,27 @@
+thaiser:
+  agreement_threshold: 0.7
+  mic_type: con
+  download_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset"
+  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp_fold0"
+  batch_size: 64
+
+feature:
+  sampling_rate: 16000
+  num_mel_bins: 40
+  frame_length: 50
+  frame_shift: 10
+  max_len: 3
+  center_feats: True
+  scale_feats: True
+  emotions: [neutral, anger, happiness, sadness]
+
+cnn1dlstm:
+  n_channels: [64, 64, 128, 128]
+  kernel_size: [5, 3, 3, 3]
+  pool_size: [4, 2, 2, 2]
+  lstm_unit: 128
+  learning_rate: 0.0001
+
+trainer:
+  weights_summary: full
+  max_epochs: 40

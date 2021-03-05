@@ -1,5 +1,8 @@
-aisser:
-  agreement_threshold: 0.7
+emodb:
+  download_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset"
+  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp_emodb"
+
+feature:
   sampling_rate: 16000
   num_mel_bins: 40
   frame_length: 50
@@ -7,10 +10,6 @@ aisser:
   max_len: 3
   center_feats: True
   scale_feats: True
-  mic_type: con
-  download_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset"
-  experiment_dir: "/Users/chompk/WORK/AIResearch/VISTEC-dataset/exp_fold0"
-  batch_size: 64
   emotions: [neutral, anger, happiness, sadness]
 
 cnn1dlstm:
