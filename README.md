@@ -29,7 +29,7 @@ python setup.py install
 ### Training with AIS-SER-TH Dataset
 We provide Google Colaboratory example for training the [AIS-SER-TH dataset]() using our repository.
 
-[![colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wc9CUuGrQHw29o3g9Iy-Wmjksebgtmau?usp=sharing)
+[![colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1kF5xBYe7d48JRaz3KfIK65A4N5dZMqWQ?usp=sharing)
 
 ### Training using provided scripts
 Note that currently, this workflow only supports pre-loaded features. So it might comsume an additional overhead of ~2 Gb or RAM. To 
@@ -49,7 +49,7 @@ We also implement a FastAPI backend server as an example of deploying a SER mode
 cd examples
 uvicorn server:app --reload
 ```
-You can customize the server by modifying `thaiser.yaml` in `inference` field.
+You can customize the server by modifying `example/thaiser.yaml` in `inference` field.
 
 Once the server spawn, you can do HTTP POST request in `form-data` format. and JSON will return as the following format:
 ```json
@@ -67,11 +67,15 @@ Once the server spawn, you can do HTTP POST request in `form-data` format. and J
 ```
 See an example below:
 
-![gif](figures/server.gif)
-
+![server-demo](figures/server.gif)
 
 ## Author & Sponsor
-[![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://airesearch.in.th/assets/img/logo/airesearch-logo.svg)](https://airesearch.in.th/)
+<a href="https://airesearch.in.th/" style="margin-right:100px">
+<img src="https://airesearch.in.th/assets/img/logo/airesearch-logo.svg" alt="airesearch" width="200"/>
+</a>
+<a href="https://www.ais.co.th/">
+<img src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/Advanced_Info_Service_logo.svg/1200px-Advanced_Info_Service_logo.svg.png" alt="ais" width="200"/>
+</a>
 
 Chompakorn Chaksangchaichot
 
