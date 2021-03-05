@@ -3,8 +3,6 @@ import os
 
 import yaml
 
-from ..data.datasets.aisser import AISSERDataModule
-
 
 def load_yaml(config_path: str) -> dict:
     assert isinstance(config_path, str), "argument must be string"
@@ -14,13 +12,17 @@ def load_yaml(config_path: str) -> dict:
     return config
 
 
-def read_config(cfg: dict, test_fold: int, include_zoom: bool) -> Tuple[dict, AISSERDataModule]:
-    aisser_config = cfg.get("aisser", {})
-    aisser_module = AISSERDataModule(test_fold=test_fold, include_zoom=include_zoom, **aisser_config)
+def read_config(cfg: dict, test_fold: int = 0, include_zoom: bool = False) -> Tuple[dict, dict]:
+    feature_config = cfg.get("feature", {"frame_shift": 10})
+    thaiser_config = cfg.get("thaiser", {})
+    module_params = {
+        "test_fold": test_fold,
+        "include_zoom": include_zoom,
+        **thaiser_config, **feature_config}
 
-    emotions = aisser_config.get("emotions", ["neutral", "anger", "happiness", "sadness"])
-    in_channel = aisser_config.get("num_mel_bins", 40)
-    sequence_length = aisser_config.get("max_len", 3) * aisser_module.sec_to_frame
+    emotions = feature_config.get("emotions", ["neutral", "anger", "happiness", "sadness"])
+    in_channel = feature_config.get("num_mel_bins", 40)
+    sequence_length = feature_config.get("max_len", 3) * feature_config["frame_shift"] * 10
     model_config = cfg.get("cnn1dlstm", {})
     hparams = {"in_channel": in_channel, "sequence_length": sequence_length, "n_classes": len(emotions), **model_config}
-    return hparams, aisser_module
+    return hparams, module_params

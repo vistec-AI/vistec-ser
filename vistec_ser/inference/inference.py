@@ -4,9 +4,10 @@ import os
 import torch.nn.functional as F
 import torch
 
-from vistec_ser.models.base_model import BaseSliceModel
-from vistec_ser.models.network import CNN1DLSTMSlice
-from vistec_ser.utils.utils import read_config, load_yaml
+from ..models.base_model import BaseSliceModel
+from ..models.network import CNN1DLSTMSlice
+from ..utils.utils import read_config, load_yaml
+from ..data.datasets.thaiser import ThaiSERDataModule
 
 
 def setup_server(temp_dir, config_path, checkpoint_path):
@@ -17,10 +18,11 @@ def setup_server(temp_dir, config_path, checkpoint_path):
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-    hparams, aisser_module = read_config(load_yaml(config_path))
+    hparams, module_params = read_config(load_yaml(config_path))
+    thaiser_module = ThaiSERDataModule(**module_params)
     model = CNN1DLSTMSlice.load_from_checkpoint(checkpoint_path=checkpoint_path, hparams=hparams)
     model.eval()
-    return model, aisser_module
+    return model, thaiser_module
 
 
 def infer_sample(model: BaseSliceModel, sample: List[Dict[str, torch.Tensor]], emotions=List[str]):
