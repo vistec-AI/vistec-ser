@@ -1,15 +1,16 @@
 # Vistec-AIS Speech Emotion Recognition
 ![python-badge](https://img.shields.io/badge/python-%3E%3D3.6-blue?logo=python)
-![tensorflow-badge](https://img.shields.io/badge/tensorflow-%3E%3D2.4.0-orange?logo=tensorflow)
+![pytorch-badge](https://img.shields.io/badge/pytorch-%3E%3D1.7.1-red?logo=pytorch)
 ![license](	https://img.shields.io/github/license/tann9949/vistec-ser)
 
-![Upload Python Package](https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg)
-![Training](https://github.com/tann9949/vistec-ser/workflows/Training/badge.svg)
+[comment]: <> (![Upload Python Package]&#40;https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg&#41;)
+
+[comment]: <> (![Training]&#40;https://github.com/tann9949/vistec-ser/workflows/Training/badge.svg&#41;)
 
 ![Code Grade](https://www.code-inspector.com/project/17426/status/svg)
 ![Code Quality Score](https://www.code-inspector.com/project/17426/score/svg)
 
-Speech Emotion Recognition Model and Inferencing using Tensorflow 2.x
+Speech Emotion Recognition Model and Inferencing using Pytorch
 
 ## Installation
 ### From Pypi
@@ -25,35 +26,48 @@ python setup.py install
 ```
 
 ## Usage
-### Train with Your Own Data
-We provide Google Colaboratory example for training `Emo-DB` dataset using our repository.
+### Training with AIS-SER-TH Dataset
+We provide Google Colaboratory example for training the [AIS-SER-TH dataset]() using our repository.
 
-[![VISTEC-depa Thailand Artificial Intelligence Research Institute](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wc9CUuGrQHw29o3g9Iy-Wmjksebgtmau?usp=sharing)
+[![colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1wc9CUuGrQHw29o3g9Iy-Wmjksebgtmau?usp=sharing)
 
-#### Preparing Data
-To train with your own data, you need to prepare 2 files:
-1. `config.yml` (see an example in [tests/config.yml](tests/config.yml)) - This file contains a
-   configuration for extracting features and features augmentation.
-2. `labels.csv` - This will be a `.csv` file containing 2 columns mapping audio path to its emotion.
-    - **Your `.csv` file should contain a header** (as we will skip the first line when reading).
-    - **Currently, we only support 5 emotions (`neutral`, `anger`, `happiness`, `sadness`, and `frustration`) if
-    you want to add more, modify `EMOTIONS` variable in [dataloader.py](vistec_ser/datasets/dataloader.py)**
-      
-#### Preparing a model
-Now, prepare your model, you can implement your own model using `tf.keras.Sequential` or using provided model
-in [models.py](vistec_ser/models/network.py).
+### Training using provided scripts
+Note that currently, this workflow only supports pre-loaded features. So it might comsume an additional overhead of ~2 Gb or RAM. To 
+run the experiment. Run the following command
 
-#### Training
-For training a model, create a `DataLoader` object and use method `.get_dataset` to get `tf.data.Dataset` used 
-for training. `DataLoader` will also use `FeatureLoader` which will read `config.yml`. 
-The dataset will automatically pad a batch according to the longest sequence length.
+Since there are 80 studios recording and 20 zoom recording. We split the dataset into 10-fold, 10 studios each. Then evaluate using
+k-fold cross validation method. We provide 2 k-fold experiments: including and excluding zoom recording. This can be configured 
+in config file (see `examples/aisser.yaml`)
+
+```shell
+python examples/train_fold_aisser.py --config-path <path-to-config> --n-iter <number-of-iterations>  
+```
 
 ### Inferencing
-*TODO*
+We also implement a FastAPI backend server as an example of deploying a SER model. To run the server, run
+```shell
+cd examples
+uvicorn server:app --reload
+```
+You can customize the server by modifying `thaiser.yaml` in `inference` field.
 
-## Reference
-This repository structure was inspired by [TensorflowASR](https://github.com/TensorSpeech/TensorFlowASR) by 
-Huy Le Nguyen ([@usimarit](https://github.com/usimarit)). Please check it out!
+Once the server spawn, you can do HTTP POST request in `form-data` format. and JSON will return as the following format:
+```json
+[
+  {
+    "name": <request-file-name>,
+    "prob": {
+      "neutral": <p(neu)>,
+      "anger": <p(ang)>,
+      "happiness": <p(hap)>,
+      "sadness": <p(sad)>
+    }
+  }, ...
+]
+```
+See an example below:
+
+![gif](figures/server.gif)
 
 
 ## Author & Sponsor
@@ -61,4 +75,4 @@ Huy Le Nguyen ([@usimarit](https://github.com/usimarit)). Please check it out!
 
 Chompakorn Chaksangchaichot
 
-Email: [chompakornc_pro@vistec.ac.th](chompakornc_pro@vistec.ac.th)
+Email: [chompakornc_pro@vistec.ac.th](`chompakornc_pro@vistec.ac.th)

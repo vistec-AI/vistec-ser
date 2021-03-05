@@ -1,19 +1,28 @@
 import setuptools
 
 requirements = [
-    "tensorflow>=2.4.0",
-    "tensorflow_io>=0.17",
+    "chardet<4.0,>=2.0",
+    "torchaudio>=0.7.2",
+    "torchvision==0.8.2",
+    "pytorch-lightning>=1.2.0",
+    "pandas>=1.2.2",
     "numpy>=1.19.2,<1.20.0",
     "soundfile>=0.10.3",
-    "PyYAML>=5.3.1",
+    "PyYAML!=5.4.*,>=5.1",
+    "gdown>=3.12.2",
+    "wget>=3.2",
+    "fastapi>=0.63.0",
+    "aiofiles>=0.6.0",
+    "python-multipart>=0.0.5",
+    "uvicorn>=0.13.4"
 ]
 
 setuptools.setup(
     name="vistec-ser",
-    version="0.3.0a1",
+    version="0.4.0a1",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
-    description="Speech Emotion Recognition models and training using Tensorflow 2.x",
+    description="Speech Emotion Recognition models and training using PyTorch",
     long_description=open('README.md', 'r').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/tann9949/vistec-ser',
