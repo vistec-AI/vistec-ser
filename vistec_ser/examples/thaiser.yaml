@@ -29,3 +29,4 @@ trainer:
 inference:
   temp_dir: /Users/chompk/WORK/AIResearch/VISTEC-dataset/
   checkpoint_path: /Users/chompk/WORK/AIResearch/VISTEC-dataset/exp/fold0/weights/final0.ckpt
+#  gpus: 0
