@@ -2,9 +2,9 @@ import setuptools
 
 requirements = [
     "chardet<4.0,>=2.0",
-    "torch>=1.8.0",
-    "torchaudio>=0.7.2",
-    "torchvision>=0.8.2",
+    "torch==1.7.1",
+    "torchaudio==0.7.2",
+    "torchvision==0.8.2",
     "pytorch-lightning>=1.2.0",
     "pandas>=1.2.2",
     "numpy>=1.19.2,<1.20.0",
