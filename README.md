@@ -1,6 +1,6 @@
 # Vistec-AIS Speech Emotion Recognition
 ![python-badge](https://img.shields.io/badge/python-%3E%3D3.6-blue?logo=python)
-![pytorch-badge](https://img.shields.io/badge/pytorch-%3E%3D1.7.1-red?logo=pytorch)
+![pytorch-badge](https://img.shields.io/badge/pytorch-%3E%3D1.8.0-red?logo=pytorch)
 ![license](	https://img.shields.io/github/license/vistec-AI/vistec-ser)
 
 [comment]: <> (![Upload Python Package]&#40;https://github.com/tann9949/vistec-ser/workflows/Upload%20Python%20Package/badge.svg&#41;)
