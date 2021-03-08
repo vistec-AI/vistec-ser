@@ -26,8 +26,8 @@ python setup.py install
 ```
 
 ## Usage
-### Training with AIS-SER-TH Dataset
-We provide Google Colaboratory example for training the [AIS-SER-TH dataset]() using our repository.
+### Training with THAI SER Dataset
+We provide Google Colaboratory example for training the [THAI SER dataset]() using our repository.
 
 [![colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1kF5xBYe7d48JRaz3KfIK65A4N5dZMqWQ?usp=sharing)
 
