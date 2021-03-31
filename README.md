@@ -27,7 +27,7 @@ python setup.py install
 
 ## Usage
 ### Training with THAI SER Dataset
-We provide Google Colaboratory example for training the [THAI SER dataset]() using our repository.
+We provide Google Colaboratory example for training the [THAI SER dataset](https://github.com/vistec-AI/dataset-releases/releases/tag/v1) using our repository.
 
 [![colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1kF5xBYe7d48JRaz3KfIK65A4N5dZMqWQ?usp=sharing)
 
