@@ -29,7 +29,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
     def __init__(
             self,
             test_fold: int,
-            agreement_threshold: float = 0.7,
+            agreement_threshold: float = 0.71,
             sampling_rate: int = 16000,
             num_mel_bins: int = 40,
             frame_length: int = 50,  # in ms
