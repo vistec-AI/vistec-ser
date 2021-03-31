@@ -91,8 +91,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             os.makedirs(self.experiment_dir)
 
         # define download URL
-        studios = []
-        version = 0.8
+        version = 1
         release_url = f"https://github.com/vistec-AI/dataset-releases/releases/download/v{version}"
         self.github_url = {
             "studio1-10": release_url+f"/studio1-10_v{version}.zip",
@@ -101,8 +100,8 @@ class ThaiSERDataModule(pl.LightningDataModule):
             "studio31-40": release_url+f"/studio31-40_v{version}.zip",
             "studio41-50": release_url+f"/studio41-50_v{version}.zip",
             "studio51-60": release_url+f"/studio51-60_v{version}.zip",
-            # "studio61-70": release_url+f"/studio61-70_v{version}.zip",
-            # "studio71-80": release_url+f"/studio71-80_v{version}.zip",
+            "studio61-70": release_url+f"/studio61-70_v{version}.zip",
+            "studio71-80": release_url+f"/studio71-80_v{version}.zip",
             "zoom1-10": release_url+f"/zoom1-10_v{version}.zip",
             "zoom11-20": release_url+f"/zoom11-20_v{version}.zip",
         }
