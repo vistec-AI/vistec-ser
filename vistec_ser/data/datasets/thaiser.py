@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 import json
 import os
 import zipfile
+from urllib.error import HTTPError
 
 from torch.utils.data import DataLoader
 from torchvision.transforms.transforms import Compose
@@ -97,7 +98,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             "studio1-10": release_url+f"/studio1-10.zip",
             "studio11-20": release_url+f"/studio11-20.zip",
             "studio21-30": release_url+f"/studio21-30.zip",
-            "studio31-40": release_url+f"/studio31-40",
+            "studio31-40": release_url+f"/studio31-40.zip",
             "studio41-50": release_url+f"/studio41-50.zip",
             "studio51-60": release_url+f"/studio51-60.zip",
             "studio61-70": release_url+f"/studio61-70.zip",
@@ -105,7 +106,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             "zoom1-10": release_url+f"/zoom1-10.zip",
             "zoom11-20": release_url+f"/zoom11-20.zip",
         }
-        self.labels_url = release_url+f"/emotion_label_v{version}.json"
+        self.labels_url = release_url+f"/emotion_label.json"
 
         # define fold split
         self.fold_config = {
@@ -115,8 +116,8 @@ class ThaiSERDataModule(pl.LightningDataModule):
             3: [f"studio{s:03d}" for s in range(31, 41)],
             4: [f"studio{s:03d}" for s in range(41, 51)],
             5: [f"studio{s:03d}" for s in range(51, 61)],
-            # 6: [f"studio{s:03d}" for s in range(61, 71)],
-            # 7: [f"studio{s:03d}" for s in range(71, 81)],
+            6: [f"studio{s:03d}" for s in range(61, 71)],
+            7: [f"studio{s:03d}" for s in range(71, 81)],
             8: [f"zoom{s:03d}" for s in range(1, 11)],
             9: [f"zoom{s:03d}" for s in range(11, 21)]
         }
@@ -323,12 +324,18 @@ class ThaiSERDataModule(pl.LightningDataModule):
             if not os.path.exists(f"{self.download_root}/{f}.zip"):
                 print(f">downloading {f}.zip ...")
                 out_name = os.path.join(self.download_root, f"{f}.zip")
-                wget.download(url=download_url, out=f"{out_name}", bar=wget.bar_adaptive)
+                try:
+                    wget.download(url=download_url, out=f"{out_name}", bar=wget.bar_adaptive)
+                except HTTPError:
+                    raise HTTPError(f"404 Error: Cannot download {download_url}")
             else:
                 pass
         # download labels
         if not os.path.exists(f"{self.download_root}/labels.json"):
-            wget.download(url=self.labels_url, out=f"{self.download_root}/labels.json", bar=wget.bar_adaptive)
+            try:
+                wget.download(url=self.labels_url, out=f"{self.download_root}/labels.json", bar=wget.bar_adaptive)
+            except HTTPError:
+                raise HTTPError(f"404 Error: Cannot download {self.labels_url}")
         print("Finished Downloading Dataset\n")
 
         # extract
