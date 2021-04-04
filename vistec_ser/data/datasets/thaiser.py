@@ -1,3 +1,4 @@
+import warnings
 from glob import glob
 from typing import Dict, List, Union
 import json
@@ -237,7 +238,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
         )
         return DataLoader(feature_dataset, batch_size=1, num_workers=self.num_workers)
 
-    def _get_audio_path(self, audio_name: str) -> str:
+    def _get_audio_path(self, audio_name: str) -> Union[str, None]:
         if not isinstance(audio_name, str):
             raise TypeError(f"audio name must be string but got {type(audio_name)}")
         studio_type = audio_name[0]
@@ -256,7 +257,8 @@ class ThaiSERDataModule(pl.LightningDataModule):
         else:
             raise NameError(f"Error reading file name {audio_name}")
         if not os.path.exists(audio_path):
-            raise FileNotFoundError(f"{audio_path} not found")
+            warnings.warn(f"{audio_path} not found, skipping...")
+            return None
         return audio_path
 
     def _prepare_labels(self):
@@ -284,7 +286,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
                 (f"{self._get_audio_path(k)}", correctemo[idx2emo[v]])
                 for k, v in {k: convert_to_hardlabel(v, thresh=self.agreement_threshold)
                              for k, v in agreements.items()}.items()
-                if v != -1
+                if v != -1 or self._get_audio_path(k) is not None
             ], columns=['PATH', 'EMOTION'])
 
             labels.to_csv(f"{self.download_root}/labels.csv", index=False)
