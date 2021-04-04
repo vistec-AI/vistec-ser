@@ -28,6 +28,55 @@ correctemo = {
 
 
 class ThaiSERDataModule(pl.LightningDataModule):
+    """
+    THAI SER data module
+
+    This class instantiate an object that allows an integration with
+    pytorch lightning's Trainer module
+
+    Attributes
+    ---------
+    test_fold: int
+        fold number of dataset used as test set. This dataset is separated
+        into 10 folds. See self.fold_config() for more info.
+    agreement_threshold: float
+        agreement threshold of the dataset. The dataset consists of multiple
+        annotators. Thus, some data might have different annotation consensus
+        among multiple annotators. `agreement_threshold` param is a threshold
+        that will filter out label that multiple annotators did not agree upon
+        selected ratio (default as 0.71). The default value was calculated from
+        inter-rater score. We recommend not to change this value.
+    sampling_rate: int
+        target sampling rate of data. Original sound sampling rate was 44100 but
+        default as 16000
+    num_mel_bins: int
+        number of mel bins used for extracting filterbank features
+    frame_length: int
+        frame length in ms of window used  for STFT
+    frame_shift: int
+        frame shift in ms of window used for STFT
+    center_feats: bool
+        specify whether to center filterbank features or not (shift to zero mean)
+    scale_feats: bool
+        specify whether to scale filterbank features or not (scale to unit variance)
+    mic_type: str
+        microphone type used for training dataset. Two choices avilable: `con` and `clip`,
+        where `con` denotes condensor mic and `clip` denotes clip mic
+    download_dir: str
+        dataset download directory
+    experiment_dir: str
+        experiment directory
+    include_zoom: bool
+        specify whether to include zoom experiment in dataset fold or not
+    max_len: int
+        max context length of features
+    batch_size: int
+        batch size of training data
+    emotions: List[str]
+        list of allowed emotion. There are 5 emotions available
+        [neutral, anger, happiness, sadness, frustration] but default
+        as four emotions: neutral, anger, happiness, sadness
+    """
     def __init__(
             self,
             test_fold: int,
@@ -48,6 +97,52 @@ class ThaiSERDataModule(pl.LightningDataModule):
             num_workers: int = 0,
             *args,
             **kwargs):
+        """
+        Construct necessary attributes for THAI SER Data Module
+
+        Parameters
+        ----------
+            test_fold: int
+                fold number of dataset used as test set. This dataset is separated
+                into 10 folds. See self.fold_config() for more info.
+            agreement_threshold: float
+                agreement threshold of the dataset. The dataset consists of multiple
+                annotators. Thus, some data might have different annotation consensus
+                among multiple annotators. `agreement_threshold` param is a threshold
+                that will filter out label that multiple annotators did not agree upon
+                selected ratio (default as 0.71). The default value was calculated from
+                inter-rater score. We recommend not to change this value.
+            sampling_rate: int
+                target sampling rate of data. Original sound sampling rate was 44100 but
+                default as 16000
+            num_mel_bins: int
+                number of mel bins used for extracting filterbank features
+            frame_length: int
+                frame length in ms of window used  for STFT
+            frame_shift: int
+                frame shift in ms of window used for STFT
+            center_feats: bool
+                specify whether to center filterbank features or not (shift to zero mean)
+            scale_feats: bool
+                specify whether to scale filterbank features or not (scale to unit variance)
+            mic_type: str
+                microphone type used for training dataset. Two choices avilable: `con` and `clip`,
+                where `con` denotes condensor mic and `clip` denotes clip mic
+            download_dir: str
+                dataset download directory
+            experiment_dir: str
+                experiment directory
+            include_zoom: bool
+                specify whether to include zoom experiment in dataset fold or not
+            max_len: int
+                max context length of features
+            batch_size: int
+                batch size of training data
+            emotions: List[str]
+                list of allowed emotion. There are 5 emotions available
+                [neutral, anger, happiness, sadness, frustration] but default
+                as four emotions: neutral, anger, happiness, sadness
+        """
         super().__init__(*args, **kwargs)
         if emotions is None:
             emotions = ["neutral", "anger", "happiness", "sadness"]
@@ -286,7 +381,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
                 (f"{self._get_audio_path(k)}", correctemo[idx2emo[v]])
                 for k, v in {k: convert_to_hardlabel(v, thresh=self.agreement_threshold)
                              for k, v in agreements.items()}.items()
-                if v != -1 or self._get_audio_path(k) is not None
+                if v != -1 and self._get_audio_path(k) is not None
             ], columns=['PATH', 'EMOTION'])
 
             labels.to_csv(f"{self.download_root}/labels.csv", index=False)
