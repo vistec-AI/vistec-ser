@@ -2,7 +2,6 @@ from glob import glob
 from typing import List
 import os
 
-import pandas as pd
 import wget
 
 
@@ -78,6 +77,3 @@ class EmoDB(object):
 
     def prepare_labels(self):
         self.download()
-        assert os.path.exists(self.label_path)
-        labels = pd.read_csv(self.label_path)
-

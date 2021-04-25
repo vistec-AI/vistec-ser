@@ -75,7 +75,8 @@ def run_fold(fold: int, config_path: str, include_zoom: bool, n_iter: int = 25, 
         # test
         print("\n>>Evaluating Model...\n")
         wa, ua, cm = evaluate_slice_model(model, test_dataloader, n_classes=thaiser_module.n_classes)
-        template = f"Confusion Matrix:\n{cm.numpy()}\nWeighted Accuracy: {wa*100:.2f}%\nUnweighted Accuracy: {ua*100:.2f}%"
+        cm = cm.numpy()
+        template = f"Confusion Matrix:\n{cm}\nWeighted Accuracy: {wa*100:.2f}%\nUnweighted Accuracy: {ua*100:.2f}%"
         print(template)
         open(f"{thaiser_module.experiment_dir}/results.txt", "a").write(f"{wa*100:.2f},{ua*100:.2f}\n")
         open(f"{thaiser_module.experiment_dir}/confusion_matrix.txt", "a").write(f"Iteration {i}:\n{cm.numpy()}\n\n")
@@ -84,7 +85,8 @@ def run_fold(fold: int, config_path: str, include_zoom: bool, n_iter: int = 25, 
         if not include_zoom:
             print("\n>>Evaluating Model (Zoom Test Set)...\n")
             wa, ua, cm = evaluate_slice_model(model, zoom_dataloader, n_classes=thaiser_module.n_classes)
-            template = f"Confusion Matrix:\n{cm.numpy()}\nWeighted Accuracy: {wa * 100:.2f}%\nUnweighted Accuracy: {ua * 100:.2f}%"
+            cm = cm.numpy()
+            template = f"Confusion Matrix:\n{cm}\nWeighted Accuracy: {wa * 100:.2f}%\nUnweighted Accuracy: {ua * 100:.2f}%"
             print(template)
             open(f"{thaiser_module.experiment_dir}/results_zoom.txt", "a").write(f"{wa * 100:.2f},{ua * 100:.2f}\n")
             open(f"{thaiser_module.experiment_dir}/confusion_matrix_zoom.txt", "a").write(f"{cm.numpy()}")

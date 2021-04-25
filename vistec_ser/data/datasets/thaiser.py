@@ -264,6 +264,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             max_len=self.max_len,
             center_feats=self.center_feats,
             scale_feats=self.scale_feats,
+            emotions=self.emotions,
             transform=transform)
         return DataLoader(train_vistec, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
 
@@ -278,6 +279,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             max_len=self.max_len,
             center_feats=self.center_feats,
             scale_feats=self.scale_feats,
+            emotions=self.emotions,
             transform=transform)
         return DataLoader(val_vistec, batch_size=1, num_workers=self.num_workers)
 
@@ -292,6 +294,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             max_len=self.max_len,
             center_feats=self.center_feats,
             scale_feats=self.scale_feats,
+            emotions=self.emotions,
             transform=transform
         )
         return DataLoader(test_vistec, batch_size=1, num_workers=self.num_workers)
@@ -307,6 +310,7 @@ class ThaiSERDataModule(pl.LightningDataModule):
             max_len=self.max_len,
             center_feats=self.center_feats,
             scale_feats=self.scale_feats,
+            emotions=self.emotions,
             transform=transform
         )
         return DataLoader(zoom_vistec, batch_size=1, num_workers=self.num_workers)

@@ -11,9 +11,12 @@ class Spectrogram(object):
         frame_length (float, optional) – Frame length in milliseconds (Default: 25.0)
         frame_shift (float, optional) – Frame shift in milliseconds (Default: 10.0)
         preemphasis_coefficient (float, optional) – Coefficient for use in signal preemphasis (Default: 0.97)
-        window_type (str, optional) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: 'povey')
-        sample_frequency (float, optional) – Waveform data sample frequency (must match the waveform file, if specified there) (Default: 16000.0)
-        dither (float, optional) – Dithering constant (0.0 means no dither). If you turn this off, you should set the energy_floor option, e.g. to 1.0 or 0.1 (Default: 0.0)
+        window_type (str, optional) – Type of window
+            (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: 'povey')
+        sample_frequency (float, optional) – Waveform data sample frequency
+            (must match the waveform file, if specified there) (Default: 16000.0)
+        dither (float, optional) – Dithering constant (0.0 means no dither). If you turn this off,
+            you should set the energy_floor option, e.g. to 1.0 or 0.1 (Default: 0.0)
     """
     def __init__(
             self,
@@ -48,10 +51,14 @@ class FilterBank(object):
             frame_shift (float, optional) – Frame shift in milliseconds (Default: 10.0)
             num_mel_bins (int, optional) – Number of triangular mel-frequency bins (Default: 23)
             preemphasis_coefficient (float, optional) – Coefficient for use in signal preemphasis (Default: 0.97)
-            window_type (str, optional) – Type of window (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: 'povey')
-            sample_frequency (float, optional) – Waveform data sample frequency (must match the waveform file, if specified there) (Default: 16000.0)
-            dither (float, optional) – Dithering constant (0.0 means no dither). If you turn this off, you should set the energy_floor option, e.g. to 1.0 or 0.1 (Default: 0.0)
-            high_freq (float, optional) – High cutoff frequency for mel bins (if <= 0, offset from Nyquist) (Default: 0.0)
+            window_type (str, optional) – Type of window
+                (‘hamming’|’hanning’|’povey’|’rectangular’|’blackman’) (Default: 'povey')
+            sample_frequency (float, optional) – Waveform data sample frequency
+                (must match the waveform file, if specified there) (Default: 16000.0)
+            dither (float, optional) – Dithering constant (0.0 means no dither). If you turn this off,
+                you should set the energy_floor option, e.g. to 1.0 or 0.1 (Default: 0.0)
+            high_freq (float, optional) – High cutoff frequency for mel bins
+                (if <= 0, offset from Nyquist) (Default: 0.0)
             low_freq (float, optional) – Low cutoff frequency for mel bins (Default: 20.0)
         """
 

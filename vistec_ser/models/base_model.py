@@ -2,7 +2,6 @@ import torch
 import pytorch_lightning as pl
 import torch.nn.functional as F
 from pytorch_lightning.metrics import functional as FM
-from torch.optim.lr_scheduler import ExponentialLR
 from torch.optim import Adam
 
 

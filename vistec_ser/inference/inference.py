@@ -27,7 +27,6 @@ def setup_server(config_path: str):
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint `{checkpoint_path}` not found.")
 
-
     hparams, module_params = read_config(config)
     thaiser_module = ThaiSERDataModule(**module_params)
     model = CNN1DLSTMSlice.load_from_checkpoint(checkpoint_path=checkpoint_path, hparams=hparams)

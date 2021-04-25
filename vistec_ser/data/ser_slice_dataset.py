@@ -40,6 +40,8 @@ class SERSliceDataset(Dataset):
         """
         if emotions is None:
             self.emotions = ["neutral", "anger", "happiness", "sadness"]
+        else:
+            self.emotions = emotions
         self.n_classes = len(self.emotions)
         assert isinstance(max_len, int)
         assert isinstance(sampling_rate, int)

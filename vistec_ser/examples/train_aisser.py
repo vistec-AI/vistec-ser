@@ -81,7 +81,8 @@ def main(arguments):
     if not include_zoom:
         print("\n>>Evaluating Model (Zoom Test Set)...\n")
         wa, ua, cm = evaluate_slice_model(model, zoom_dataloader, n_classes=thaiser_module.n_classes)
-        template = f"Confusion Matrix:\n{cm.numpy()}\nWeighted Accuracy: {wa * 100:.2f}%\nUnweighted Accuracy: {ua * 100:.2f}%"
+        cm = cm.numpy()
+        template = f"Confusion Matrix:\n{cm}\nWeighted Accuracy: {wa * 100:.2f}%\nUnweighted Accuracy: {ua * 100:.2f}%"
         print(template)
         open(f"{thaiser_module.experiment_dir}/results_zoom.txt", "a").write(f"{wa * 100:.2f},{ua * 100:.2f}\n")
         open(f"{thaiser_module.experiment_dir}/confusion_matrix_zoom.txt", "a").write(f"{cm.numpy()}")
