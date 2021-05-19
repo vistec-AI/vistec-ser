@@ -9,7 +9,8 @@ class BaseModel(pl.LightningModule):
     def __init__(self, hparams, **kwargs):
         super().__init__(**kwargs)
         self.hyperparams = hparams
-        
+        self.learning_rate = self.hyperparams.get("learning_rate", 1e-4)
+
     def forward(self, *args, **kwargs):
         raise NotImplementedError()
 
@@ -39,7 +40,7 @@ class BaseModel(pl.LightningModule):
         self.log_dict(metrics, prog_bar=True, logger=True)
 
     def configure_optimizers(self):
-        opt = Adam(self.parameters(), lr=self.hyperparams.learning_rate)
+        opt = Adam(self.parameters(), lr=self.learning_rate)
         return opt
 
 
