@@ -8,7 +8,7 @@ from torch.optim import Adam
 class BaseModel(pl.LightningModule):
     def __init__(self, hparams, **kwargs):
         super().__init__(**kwargs)
-        self.hparams = hparams
+        self.hyperparams = hparams
         
     def forward(self, *args, **kwargs):
         raise NotImplementedError()
@@ -39,7 +39,7 @@ class BaseModel(pl.LightningModule):
         self.log_dict(metrics, prog_bar=True, logger=True)
 
     def configure_optimizers(self):
-        opt = Adam(self.parameters(), lr=self.hparams.learning_rate)
+        opt = Adam(self.parameters(), lr=self.hyperparams.learning_rate)
         return opt
 
 
