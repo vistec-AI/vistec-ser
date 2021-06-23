@@ -86,7 +86,7 @@ class SERSliceDataset(Dataset):
         return x_chopped
 
     def _load_feature(self, audio_path: str) -> torch.Tensor:
-        audio, sample_rate = torchaudio.backend.sox_backend.load(audio_path)
+        audio, sample_rate = torchaudio.backend.sox_io_backend.load(audio_path)
 
         # initial preprocess
         # convert to mono, resample, truncate
