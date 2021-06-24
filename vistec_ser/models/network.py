@@ -91,11 +91,11 @@ class CNN1DLSTMSlice(BaseSliceModel):
 
     def forward(self, x):
         for cnn in self.cnn_layers:
-            x = cnn(x)
-        x = x.transpose(1, 2)
-        _, (x, _) = self.lstm(x)
-        x = x.transpose(0, 1)
-        x = x.reshape(x.shape[0], x.shape[1] * x.shape[2])
+            x = cnn(x)  # (batch_size, freq, time_seq)
+        x = x.transpose(1, 2)  # (batch_size, time_seq, freq)
+        _, (x, _) = self.lstm(x)  # (num_layers * num_directions, batch, hidden_size)
+        x = x.transpose(0, 1)  # (batch_size, num_layers * num_directions, hidden_size)
+        x = x.reshape(x.shape[0], x.shape[1] * x.shape[2])  # flatten -> (batch_size, feat_dim)
         x = self.logits(x)
         return x
 
