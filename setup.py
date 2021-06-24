@@ -19,7 +19,7 @@ requirements = [
 
 setuptools.setup(
     name="vistec-ser",
-    version="0.4.4a1",
+    version="0.4.5a1",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
     description="Speech Emotion Recognition models and training using PyTorch",
