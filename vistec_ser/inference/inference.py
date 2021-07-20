@@ -35,7 +35,7 @@ def setup_server(config_path: str):
     return model, thaiser_module, temp_dir
 
 
-def infer_sample(model: BaseSliceModel, sample: List[Dict[str, torch.Tensor]], emotions=List[str]):
+def infer_sample(model: BaseSliceModel, sample: List[Dict[str, torch.Tensor]], emotions: List[str]):
     name = os.path.basename(sample[0]["emotion"][0])
     final_logits = torch.stack([model(chunk["feature"]) for chunk in sample]).mean(dim=0)
     assert len(final_logits) == 1

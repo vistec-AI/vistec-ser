@@ -100,7 +100,6 @@ class SERSliceDataset(Dataset):
             csv = pd.read_csv(csv_file)
         else:
             csv = csv_file
-        print("Extracting Features...")
         samples = []
         for i, (path, emotion) in tqdm(csv.iterrows(), total=len(csv)):
             if emotion.lower().strip() not in self.emotions:
