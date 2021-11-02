@@ -5,7 +5,7 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 from torchaudio.compliance import kaldi
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from .features.padding import pad_dup
 from .features.transform import NormalizeSample
@@ -92,7 +92,11 @@ class SERSliceDataset(Dataset):
         # convert to mono, resample, truncate
         audio = torch.unsqueeze(audio.mean(dim=0), dim=0)  # convert to mono
         if sample_rate != self.sampling_rate:
-            audio = kaldi.resample_waveform(audio, orig_freq=sample_rate, new_freq=self.sampling_rate)
+            audio = torchaudio.functional.resample(
+                audio, 
+                orig_freq=sample_rate, 
+                new_freq=self.sampling_rate
+            )
         return audio
 
     def _load_csv(self, csv_file: Union[str, pd.DataFrame]) -> List[Dict[str, torch.Tensor]]:

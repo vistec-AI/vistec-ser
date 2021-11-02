@@ -3,8 +3,9 @@ import setuptools
 requirements = [
     "chardet<4.0,>=2.0",
     "torch>=1.7.1",
-    "torchaudio>=0.7.2",
     "torchvision>=0.8.2",
+    "torchtext>=0.8.2",
+    "torchaudio>=0.7.2",
     "pytorch-lightning>=1.2.0",
     "pandas>=1.1.5",
     "numpy>=1.19.2,<1.20.0",
@@ -19,7 +20,7 @@ requirements = [
 
 setuptools.setup(
     name="vistec-ser",
-    version="0.4.5a2",
+    version="0.4.6a1",
     author="Chompakorn Chaksangchaichot",
     author_email="chompakorn.cc@gmail.com",
     description="Speech Emotion Recognition models and training using PyTorch",
