@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from torch.utils.data import DataLoader
-import pytorch_lightning.metrics.functional as FM
+import torchmetrics.functional as FM
 import torch
 
 from ..models.base_model import BaseSliceModel
